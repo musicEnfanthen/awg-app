@@ -10,6 +10,7 @@ import {
     SourceDescriptionWritingMaterialItemLocation,
     SourceDescriptionWritingMaterialSystems,
 } from '@awg-views/edition-view/models';
+import { SourceDescriptionContent } from '@awg-views/edition-view/models/source-description.model';
 
 /**
  * The SourceDescription component.
@@ -25,6 +26,9 @@ import {
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SourceDescriptionComponent {
+    @Input()
+    editionComplexLabel: string;
+
     /**
      * Input variable: sourceDescriptionListData.
      *
@@ -64,6 +68,9 @@ export class SourceDescriptionComponent {
      * It keeps the routes to the firm signs.
      */
     readonly FIRM_SIGNS = EDITION_FIRM_SIGNS_DATA;
+
+    showOnlyComplexRelatedItems: boolean[] = [];
+    openAllDetails: boolean[] = [];
 
     /**
      * Self-referring variable needed for CompileHtml library.
@@ -236,5 +243,35 @@ export class SourceDescriptionComponent {
             return;
         }
         this.selectSvgSheetRequest.emit({ complexId: complexId, sheetId: sheetId });
+    }
+
+    // --------------------------
+
+    /**
+     * Public method: toggleDetails.
+     *
+     * It toogles the boolean switch for displaying the details
+     * of the source description content at a given source index.
+     *
+     * @param {number} index The given source index.
+     *
+     * @returns {void} Toggles the boolean flag.
+     */
+    toggleDetails(index: number): void {
+        this.openAllDetails[index] = !this.openAllDetails[index];
+    }
+
+    toggleComplexUnrelatedItems(index: number): void {
+        this.showOnlyComplexRelatedItems[index] = !this.showOnlyComplexRelatedItems[index];
+    }
+
+    contentIsInCurrentComplex(content: SourceDescriptionContent): boolean {
+        const checkValue = content.item ? content.item : content.itemDescription;
+
+        if (checkValue.includes(this.editionComplexLabel)) {
+            return true;
+        }
+
+        return false;
     }
 }

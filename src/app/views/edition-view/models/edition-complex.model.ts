@@ -69,6 +69,11 @@ export class EditionComplex {
     complexId: EditionRouteConstant;
 
     /**
+     * The label for the current edition complex.
+     */
+    complexLabel: string;
+
+    /**
      * The route for the current series.
      */
     series: EditionRouteConstant;
@@ -118,9 +123,10 @@ export class EditionComplex {
 
         // Set dynamic routes
         this.titleStatement = titleStatement;
-        this.responsibilityStatement = responsibilityStatement || new EditionResponsibilityStatement();
+        this.complexLabel = `${this.titleStatement.catalogueType.short} ${this.titleStatement.catalogueNumber}`;
 
         this.complexId = new EditionRouteConstant();
+
         if (this.titleStatement.catalogueType === EDITION_CATALOGUE_TYPE_CONSTANTS.OPUS) {
             this.complexId.route = EDITION_CATALOGUE_TYPE_CONSTANTS.OPUS.route;
         } else if (this.titleStatement.catalogueType === EDITION_CATALOGUE_TYPE_CONSTANTS.MNR) {
@@ -128,11 +134,13 @@ export class EditionComplex {
         } else if (this.titleStatement.catalogueType === EDITION_CATALOGUE_TYPE_CONSTANTS.MNR_PLUS) {
             this.complexId.route = EDITION_CATALOGUE_TYPE_CONSTANTS.MNR_PLUS.route;
         }
+
         // For routes, replace slashes in catalogue number with underscores
         this.complexId.route += this.titleStatement.catalogueNumber.replace(/\//g, '_');
         this.complexId.short = this.titleStatement.catalogueType.short + spacer + this.titleStatement.catalogueNumber;
         this.complexId.full = this.titleStatement.title + spacer + this.complexId.short;
 
+        this.responsibilityStatement = responsibilityStatement || new EditionResponsibilityStatement();
         this.series = series || new EditionRouteConstant();
         this.section = section || new EditionRouteConstant();
         this.type = type || new EditionRouteConstant();

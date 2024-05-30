@@ -34,6 +34,7 @@
                         <ng-template>
                             @if (editionReportData[1]) {
                                 <awg-source-description
+                                    [editionComplexLabel]="editionComplex.complexLabel"
                                     [sourceDescriptionListData]="editionReportData[1]"
                                     (navigateToReportFragmentRequest)="onReportFragmentNavigate($event)"
                                     (openModalRequest)="onModalOpen($event)"

@@ -1,6 +1,10 @@
 @if (sourceDescriptionListData) {
     <div class="awg-source-description-list">
-        @for (sourceDescription of sourceDescriptionListData.sources; track sourceDescription) {
+        @for (
+            sourceDescription of sourceDescriptionListData.sources;
+            track sourceDescription;
+            let sourceIndex = $index
+        ) {
             <div class="awg-source-description card mb-2" [id]="sourceDescription.id">
                 <div class="card-body">
                     <div class="awg-source-description-head">
@@ -219,12 +223,37 @@
                             <!-- content -->
                             @if (utils.isNotEmptyArray(sourceDescription.description.content)) {
                                 <div class="awg-source-description-content">
-                                    <p class="no-para"><span class="smallcaps">Inhalt:</span></p>
+                                    <p class="no-para">
+                                        <span class="smallcaps">Inhalt:</span>
+                                    </p>
+                                    <p class="half-para text-info">
+                                        <span
+                                            (click)="toggleDetails(sourceIndex)"
+                                            style="display: inline-block; cursor: pointer"
+                                            class="px-3"
+                                            >[Alle {{ openAllDetails[sourceIndex] ? 'ein' : 'auf' }}klappen]</span
+                                        >
+                                        <span (click)="toggleComplexUnrelatedItems(sourceIndex)" style="cursor: pointer"
+                                            >[{{
+                                                showOnlyComplexRelatedItems[sourceIndex]
+                                                    ? 'Filter aufheben'
+                                                    : 'Nach ' + editionComplexLabel + ' filtern'
+                                            }}]</span
+                                        >
+                                    </p>
                                     @for (content of sourceDescription.description.content; track content) {
-                                        <p class="half-para">
+                                        <details
+                                            [open]="openAllDetails[sourceIndex]"
+                                            class="half-para"
+                                            [ngClass]="{
+                                                'text-muted lighter small': !contentIsInCurrentComplex(content),
+                                                'd-none':
+                                                    !contentIsInCurrentComplex(content) &&
+                                                    showOnlyComplexRelatedItems[sourceIndex]
+                                            }">
                                             <!-- content.itemDescription -->
                                             @if (content.item || content.itemDescription) {
-                                                <span class="awg-source-description-content-item">
+                                                <summary class="awg-source-description-content-item">
                                                     @if (content.item && utils.isNotEmptyObject(content.itemLinkTo)) {
                                                         <a
                                                             (click)="
@@ -250,7 +279,7 @@
                                                         ></span>
                                                     }
                                                     <span>:</span><br />
-                                                </span>
+                                                </summary>
                                             }
                                             <!-- content.folios -->
                                             @if (utils.isNotEmptyArray(content.folios)) {
@@ -477,7 +506,7 @@
                                                     }
                                                 }
                                             }
-                                        </p>
+                                        </details>
                                     }
                                 </div>
                             }
