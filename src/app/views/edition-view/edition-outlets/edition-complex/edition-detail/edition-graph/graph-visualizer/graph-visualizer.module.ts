@@ -12,7 +12,7 @@ import { SparqlTableComponent } from './sparql-table';
 import { TriplesEditorComponent } from './triples-editor';
 import { UnsupportedTypeResultsComponent } from './unsupported-type-results';
 
-import { GraphVisualizerService } from './services';
+import { ForceGraphD3Service, GraphVisualizerService } from './services';
 
 import { PrefixPipe } from './prefix-pipe';
 
@@ -37,6 +37,6 @@ import { PrefixPipe } from './prefix-pipe';
         UnsupportedTypeResultsComponent,
     ],
     exports: [GraphVisualizerComponent],
-    providers: [GraphVisualizerService, PrefixPipe],
+    providers: [ForceGraphD3Service, GraphVisualizerService, PrefixPipe],
 })
 export class GraphVisualizerModule {}

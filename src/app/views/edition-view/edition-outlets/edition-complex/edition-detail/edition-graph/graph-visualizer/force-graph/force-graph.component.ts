@@ -36,7 +36,7 @@ import {
     Triple,
 } from '../models';
 import { PrefixPipe } from '../prefix-pipe/prefix.pipe';
-import { GraphVisualizerService } from '../services/graph-visualizer.service';
+import { ForceGraphD3Service, GraphVisualizerService } from '../services';
 
 import * as D3_DRAG from 'd3-drag';
 import * as D3_FORCE from 'd3-force';
@@ -206,13 +206,15 @@ export class ForceGraphComponent implements OnInit, OnChanges, OnDestroy {
     /**
      * Constructor of the ForceGraphComponent.
      *
-     * It declares private instances of the
+     * It declares private instances of the {@link D3Service},
      * {@link GraphVisualizerService} and the {@link PrefixPipe}.
      *
+     * @param {D3Service} forceGraphD3Service Instance of the D3Service.
      * @param {GraphVisualizerService} graphVisualizerService Instance of the GraphVisualizerService.
      * @param {PrefixPipe} prefixPipe Instance of the PrefixPipe.
      */
     constructor(
+        private forceGraphD3Service: ForceGraphD3Service,
         private graphVisualizerService: GraphVisualizerService,
         private prefixPipe: PrefixPipe
     ) {}
@@ -585,10 +587,10 @@ export class ForceGraphComponent implements OnInit, OnChanges, OnDestroy {
         // ==================== FORCES ====================
         this._forceSimulation.on('tick', () => {
             // Update node and link positions each tick of the simulation
-            this._updateNodePositions(nodes);
-            this._updateNodeTextPositions(nodeTexts);
-            this._updateLinkPositions(links);
-            this._updateLinkTextPositions(linkTexts);
+            this.forceGraphD3Service.updateNodePositions(nodes, 'cx', 'cy');
+            this.forceGraphD3Service.updateNodePositions(nodeTexts, 'x', 'y', 12, 3);
+            this.forceGraphD3Service.updateLinkPositions(links);
+            this.forceGraphD3Service.updateLinkTextPositions(linkTexts);
         });
 
         // ==================== DRAG ====================
@@ -627,7 +629,7 @@ export class ForceGraphComponent implements OnInit, OnChanges, OnDestroy {
             // Rdf:type
             predicateNode.label === 'a' ||
             predicateNode.label === 'rdf:type' ||
-            predicateNode.label === this.prefixPipe.transform('rdf:type', PrefixForm.LONG)
+            predicateNode.label === this.prefixPipe.transform('rdf', PrefixForm.LONG) + 'type'
         );
     }
 
@@ -897,146 +899,5 @@ export class ForceGraphComponent implements OnInit, OnChanges, OnDestroy {
         });
 
         return graphData;
-    }
-
-    /**
-     * Private method: _updateNodePositions.
-     *
-     * It updates the positions of the nodes
-     * on a force simulation's tick.
-     *
-     * @param {D3Selection} nodes The given nodes selection.
-     *
-     * @returns {void} Updates the position.
-     */
-    private _updateNodePositions(nodes: D3Selection): void {
-        nodes.attr('cx', (d: D3SimulationNode) => d.x).attr('cy', (d: D3SimulationNode) => d.y);
-
-        /*
-        // constrains the nodes to be within a box
-        nodes
-            .attr(
-                'cx',
-                (d: D3SimulationNode) =>
-                    (d.x = Math.max(this._nodeRadius(d), Math.min(this._divWidth - this._nodeRadius(d), d.x)))
-            )
-            .attr(
-                'cy',
-                (d: D3SimulationNode) =>
-                    (d.y = Math.max(this._nodeRadius(d), Math.min(this._divHeight - this._nodeRadius(d), d.y)))
-            );
-         */
-    }
-
-    /**
-     * Private method: _updateNodeTextPositions.
-     *
-     * It updates the positions of the nodeTexts
-     * on a force simulation's tick.
-     *
-     * @param {D3Selection} nodeTexts The given nodeTexts selection.
-     *
-     * @returns {void} Updates the position.
-     */
-    private _updateNodeTextPositions(nodeTexts: D3Selection): void {
-        nodeTexts.attr('x', (d: D3SimulationNode) => d.x + 12).attr('y', (d: D3SimulationNode) => d.y + 3);
-    }
-
-    /**
-     * Private method: _updateLinkPositions.
-     *
-     * It updates the positions of the links
-     * on a force simulation's tick.
-     * Cf. https://stackoverflow.com/questions/16358905/d3-force-layout-graph-self-linking-node
-     *
-     * @param {D3Selection} links The given links selection.
-     *
-     * @returns {void} Updates the position.
-     */
-    private _updateLinkPositions(links: D3Selection): void {
-        links.attr('d', (d: D3SimulationNodeTriple) => {
-            const x1 = d.nodeSubject.x;
-            const y1 = d.nodeSubject.y;
-            let x2 = d.nodeObject.x;
-            let y2 = d.nodeObject.y;
-            const dr = 0;
-
-            // Defaults for normal edge.
-            let drx = dr;
-            let dry = dr;
-            let xRotation = 0; // Degrees
-            let largeArc = 0; // 1 or 0
-            const sweep = 1; // 1 or 0
-
-            // Self edge.
-            if (x1 === x2 && y1 === y2) {
-                // Fiddle with this angle to get loop oriented.
-                xRotation = -45;
-
-                // Needs to be 1.
-                largeArc = 1;
-
-                // Change sweep to change orientation of loop
-                // Sweep = 0;
-
-                // Make drx and dry different to get an ellipse instead of a circle.
-                drx = 30;
-                dry = 20;
-
-                /* For whatever reason the arc collapses to a point if the beginning
-                 * and ending points of the arc are the same, so kludge it.
-                 */
-                x2 = x2 + 1;
-                y2 = y2 + 1;
-            }
-
-            return (
-                'M' +
-                x1 +
-                ',' +
-                y1 +
-                'A' +
-                drx +
-                ',' +
-                dry +
-                ' ' +
-                xRotation +
-                ',' +
-                largeArc +
-                ',' +
-                sweep +
-                ' ' +
-                x2 +
-                ',' +
-                y2
-            );
-        });
-    }
-
-    /**
-     * Private method: _updateLinkTextPositions.
-     *
-     * It updates the positions of the link texts
-     * on a force simulation's tick.
-     *
-     * @param {D3Selection} linkTexts The given linkTexts selection.
-     *
-     * @returns {void} Updates the position.
-     */
-    private _updateLinkTextPositions(linkTexts: D3Selection): void {
-        linkTexts
-            .attr('x', (d: D3SimulationNodeTriple) => {
-                if (d.nodeSubject.x === d.nodeObject.x && d.nodeSubject.y === d.nodeObject.y) {
-                    return 20 + (d.nodeSubject.x + d.nodePredicate.x + d.nodeObject.x) / 3;
-                }
-
-                return 10 + (d.nodeSubject.x + d.nodePredicate.x + d.nodeObject.x) / 3;
-            })
-            .attr('y', (d: D3SimulationNodeTriple) => {
-                if (d.nodeSubject.x === d.nodeObject.x && d.nodeSubject.y === d.nodeObject.y) {
-                    return -40 + (d.nodeSubject.y + d.nodePredicate.y + d.nodeObject.y) / 3;
-                }
-                return 4 + (d.nodeSubject.y + d.nodePredicate.y + d.nodeObject.y) / 3;
-            });
     }
 }
