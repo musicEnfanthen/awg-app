@@ -1,14 +1,32 @@
-<div class="row row-cols-1 row-cols-md-3 row-cols-xl-5 g-4">
+<div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
     @for (complex of complexes; track complex.complex.complexId.short) {
         <div class="col">
             <div class="card awg-edition-card h-100">
                 <div class="card-body">
-                    <h5 class="card-title" [ngClass]="{ 'text-muted': complex.disabled }">
-                        <span class="awg-edition-info-header-title" [innerHTML]="complex.complex.complexId.full"></span>
+                    <h5 class="d-flex align-items-center card-title" [ngClass]="{ 'text-muted': complex.disabled }">
+                        <span
+                            class="badge border border-info text-info"
+                            [ngClass]="{ disabled: complex.disabled }"
+                            [innerHTML]="complex.complex.complexId.short"></span>
+                        <span
+                            class="awg-edition-info-header-title ms-2"
+                            [innerHTML]="complex.complex.complexId.full"></span>
                     </h5>
+
+                    @if (complex.subComplexes && complex.subComplexes.length > 0) {
+                        <hr />
+                        <p class="card-text">Enthält:</p>
+                        <ul class="list-group list-group-flush">
+                            @for (subComplex of complex.subComplexes; track subComplex.complex.complexId.short) {
+                                <li class="list-group-item">
+                                    <span [innerHTML]="subComplex.complex.complexId.full"></span>
+                                </li>
+                            }
+                        </ul>
+                    }
                 </div>
-                <div class="card-footer">
-                    @if (!complex.disabled) {
+                @if (!complex.disabled) {
+                    <div class="card-footer">
                         <p class="awg-edition-responsibility">
                             <small class="text-muted">
                                 Ediert von
@@ -29,16 +47,17 @@
                                 <span class="version">{{ complex.complex.respStatement.lastModified }}</span>
                             </small>
                         </p>
-                    }
-                    <p class="text-end">
-                        <a
-                            [routerLink]="[complex.complex.baseRoute]"
-                            class="btn btn-outline-info"
-                            [ngClass]="{ disabled: complex.disabled }"
-                            >Mehr ...
-                        </a>
-                    </p>
-                </div>
+
+                        <p class="text-end">
+                            <a
+                                [routerLink]="[complex.complex.baseRoute]"
+                                class="btn btn-outline-info"
+                                [ngClass]="{ disabled: complex.disabled }"
+                                >Mehr ...
+                            </a>
+                        </p>
+                    </div>
+                }
             </div>
         </div>
     }

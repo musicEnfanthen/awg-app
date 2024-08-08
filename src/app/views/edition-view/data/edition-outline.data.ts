@@ -13,53 +13,68 @@ export const EDITION_OUTLINE_DATA: EditionOutlineSeries[] = [
         sections: [
             {
                 section: EDITION_ROUTE_CONSTANTS.SECTION_1,
-                complexes: { opus: [], mnr: [] },
+                complexTypes: { opus: [], mnr: [] },
                 disabled: true,
             },
             {
                 section: EDITION_ROUTE_CONSTANTS.SECTION_2,
-                complexes: { opus: [], mnr: [] },
+                complexTypes: { opus: [], mnr: [] },
                 disabled: true,
             },
             {
                 section: EDITION_ROUTE_CONSTANTS.SECTION_3,
-                complexes: { opus: [], mnr: [] },
+                complexTypes: { opus: [], mnr: [] },
                 disabled: true,
             },
             {
                 section: EDITION_ROUTE_CONSTANTS.SECTION_4,
-                complexes: { opus: [], mnr: [] },
+                complexTypes: { opus: [], mnr: [] },
                 disabled: true,
             },
             {
                 section: EDITION_ROUTE_CONSTANTS.SECTION_5,
-                complexes: {
+                complexTypes: {
                     opus: [
-                        { complex: EDITION_COMPLEXES.OP3, disabled: false },
-                        { complex: EDITION_COMPLEXES.OP4, disabled: false },
-                        { complex: EDITION_COMPLEXES.OP12, disabled: false },
-                        { complex: EDITION_COMPLEXES.OP23, disabled: false },
-                        { complex: EDITION_COMPLEXES.OP25, disabled: false },
+                        {
+                            complex: EDITION_COMPLEXES.OP3,
+                            disabled: false,
+                            subComplexes: [
+                                { complex: EDITION_COMPLEXES.M133, disabled: true },
+                                { complex: EDITION_COMPLEXES.M134, disabled: true },
+                                { complex: EDITION_COMPLEXES.M135, disabled: true },
+                                { complex: EDITION_COMPLEXES.M136, disabled: true },
+                                { complex: EDITION_COMPLEXES.M137, disabled: true },
+                            ],
+                        },
+                        {
+                            complex: EDITION_COMPLEXES.OP4,
+                            disabled: false,
+                            subComplexes: [
+                                { complex: EDITION_COMPLEXES.M138, disabled: true },
+                                { complex: EDITION_COMPLEXES.M139, disabled: true },
+                                { complex: EDITION_COMPLEXES.M140, disabled: true },
+                                { complex: EDITION_COMPLEXES.M141, disabled: true },
+                                { complex: EDITION_COMPLEXES.M142, disabled: true },
+                            ],
+                        },
+                        {
+                            complex: EDITION_COMPLEXES.OP12,
+                            disabled: false,
+                            subComplexes: [
+                                { complex: EDITION_COMPLEXES.M213, disabled: true },
+                                { complex: EDITION_COMPLEXES.M212, disabled: true },
+                                { complex: EDITION_COMPLEXES.M216, disabled: true },
+                                { complex: EDITION_COMPLEXES.M217, disabled: true },
+                            ],
+                        },
+                        { complex: EDITION_COMPLEXES.OP23, disabled: false, subComplexes: [] },
+                        { complex: EDITION_COMPLEXES.OP25, disabled: false, subComplexes: [] },
                     ],
                     mnr: [
-                        { complex: EDITION_COMPLEXES.M133, disabled: true },
-                        { complex: EDITION_COMPLEXES.M134, disabled: true },
-                        { complex: EDITION_COMPLEXES.M135, disabled: true },
-                        { complex: EDITION_COMPLEXES.M136, disabled: true },
-                        { complex: EDITION_COMPLEXES.M137, disabled: true },
-                        { complex: EDITION_COMPLEXES.M138, disabled: true },
-                        { complex: EDITION_COMPLEXES.M139, disabled: true },
-                        { complex: EDITION_COMPLEXES.M140, disabled: true },
-                        { complex: EDITION_COMPLEXES.M141, disabled: true },
-                        { complex: EDITION_COMPLEXES.M142, disabled: true },
                         { complex: EDITION_COMPLEXES.M143, disabled: false },
                         { complex: EDITION_COMPLEXES.M144, disabled: false },
                         { complex: EDITION_COMPLEXES.M145, disabled: false },
                         { complex: EDITION_COMPLEXES.M146, disabled: false },
-                        { complex: EDITION_COMPLEXES.M213, disabled: true },
-                        { complex: EDITION_COMPLEXES.M212, disabled: true },
-                        { complex: EDITION_COMPLEXES.M216, disabled: true },
-                        { complex: EDITION_COMPLEXES.M217, disabled: true },
                     ],
                 },
                 disabled: false,
@@ -71,12 +86,12 @@ export const EDITION_OUTLINE_DATA: EditionOutlineSeries[] = [
         sections: [
             {
                 section: EDITION_ROUTE_CONSTANTS.SECTION_1,
-                complexes: { opus: [], mnr: [] },
+                complexTypes: { opus: [], mnr: [] },
                 disabled: true,
             },
             {
                 section: EDITION_ROUTE_CONSTANTS.SECTION_2A,
-                complexes: {
+                complexTypes: {
                     opus: [],
                     mnr: [
                         { complex: EDITION_COMPLEXES.M22, disabled: false },
@@ -91,22 +106,22 @@ export const EDITION_OUTLINE_DATA: EditionOutlineSeries[] = [
             },
             {
                 section: EDITION_ROUTE_CONSTANTS.SECTION_2B,
-                complexes: { opus: [], mnr: [] },
+                complexTypes: { opus: [], mnr: [] },
                 disabled: true,
             },
             {
                 section: EDITION_ROUTE_CONSTANTS.SECTION_3,
-                complexes: { opus: [], mnr: [] },
+                complexTypes: { opus: [], mnr: [] },
                 disabled: true,
             },
             {
                 section: EDITION_ROUTE_CONSTANTS.SECTION_4,
-                complexes: { opus: [], mnr: [] },
+                complexTypes: { opus: [], mnr: [] },
                 disabled: true,
             },
             {
                 section: EDITION_ROUTE_CONSTANTS.SECTION_5,
-                complexes: { opus: [], mnr: [] },
+                complexTypes: { opus: [], mnr: [] },
                 disabled: true,
             },
         ],
@@ -116,27 +131,27 @@ export const EDITION_OUTLINE_DATA: EditionOutlineSeries[] = [
         sections: [
             {
                 section: EDITION_ROUTE_CONSTANTS.SECTION_1,
-                complexes: { opus: [], mnr: [] },
+                complexTypes: { opus: [], mnr: [] },
                 disabled: true,
             },
             {
                 section: EDITION_ROUTE_CONSTANTS.SECTION_2,
-                complexes: { opus: [], mnr: [] },
+                complexTypes: { opus: [], mnr: [] },
                 disabled: true,
             },
             {
                 section: EDITION_ROUTE_CONSTANTS.SECTION_3,
-                complexes: { opus: [], mnr: [] },
+                complexTypes: { opus: [], mnr: [] },
                 disabled: true,
             },
             {
                 section: EDITION_ROUTE_CONSTANTS.SECTION_4,
-                complexes: { opus: [], mnr: [] },
+                complexTypes: { opus: [], mnr: [] },
                 disabled: true,
             },
             {
                 section: EDITION_ROUTE_CONSTANTS.SERIES_3_SECTION_5,
-                complexes: { opus: [], mnr: [] },
+                complexTypes: { opus: [], mnr: [] },
                 disabled: true,
             },
         ],

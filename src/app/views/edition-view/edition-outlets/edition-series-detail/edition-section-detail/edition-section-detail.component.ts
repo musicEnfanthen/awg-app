@@ -5,7 +5,7 @@ import { Subject } from 'rxjs';
 import { filter, takeUntil } from 'rxjs/operators';
 
 import { UtilityService } from '@awg-core/services';
-import { EditionOutlineSection, EditionOutlineSeries } from '@awg-views/edition-view/models';
+import { EditionOutlineComplexItem, EditionOutlineSection, EditionOutlineSeries } from '@awg-views/edition-view/models';
 import { EditionService } from '@awg-views/edition-view/services';
 
 /**
@@ -33,6 +33,13 @@ export class EditionSectionDetailComponent implements OnInit, OnDestroy {
      * It keeps the selected section of the edition.
      */
     selectedSection: EditionOutlineSection;
+
+    /**
+     * Public variable: combinedMnrComplexes.
+     *
+     * It keeps the combined mnr complexes of the section.
+     */
+    combinedMnrComplexes: EditionOutlineComplexItem[] = [];
 
     /**
      * Private variable: _destroyed$.
@@ -90,7 +97,32 @@ export class EditionSectionDetailComponent implements OnInit, OnDestroy {
                 const seriesId = series.series.route;
                 this.selectedSection = this.editionService.getEditionSectionById(seriesId, sectionId);
                 this.editionService.updateSelectedEditionSection(this.selectedSection);
+
+                this.processSubComplexes();
             });
+    }
+
+    /**
+     * Public method: processSubComplexes.
+     *
+     * It processes and sorts the sub (mnr) complexes of the selected section.
+     *
+     * @returns {void} Sets the combined mnr complexes.
+     */
+    processSubComplexes(): void {
+        if (this.selectedSection && this.utils.isNotEmptyObject(this.selectedSection.complexTypes)) {
+            if (this.utils.isNotEmptyArray(this.selectedSection.complexTypes.opus)) {
+                const opusSubComplexes = this.selectedSection.complexTypes.opus.flatMap(opus =>
+                    this.utils.isNotEmptyArray(opus.subComplexes) ? opus.subComplexes : []
+                );
+
+                this.combinedMnrComplexes = [...this.selectedSection.complexTypes.mnr, ...opusSubComplexes];
+
+                this.combinedMnrComplexes.sort((a, b) =>
+                    a.complex.titleStatement.catalogueNumber.localeCompare(b.complex.titleStatement.catalogueNumber)
+                );
+            }
+        }
     }
 
     /**

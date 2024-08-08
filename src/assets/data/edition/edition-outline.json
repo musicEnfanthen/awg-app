@@ -1,0 +1,152 @@
+{
+    "editionOutline": [
+        {
+            "series": "1",
+            "sections": [
+                {
+                    "section": "1",
+                    "complexes": { "opus": [], "mnr": [] },
+                    "disabled": true
+                },
+                {
+                    "section": "2",
+                    "complexes": { "opus": [], "mnr": [] },
+                    "disabled": true
+                },
+                {
+                    "section": "3",
+                    "complexes": { "opus": [], "mnr": [] },
+                    "disabled": true
+                },
+                {
+                    "section": "4",
+                    "complexes": { "opus": [], "mnr": [] },
+                    "disabled": true
+                },
+                {
+                    "section": "5",
+                    "complexes": {
+                        "opus": [
+                            {
+                                "complex": "OP3",
+                                "disabled": false,
+                                "subComplexes": [
+                                    { "complex": "M133", "disabled": true },
+                                    { "complex": "M134", "disabled": true },
+                                    { "complex": "M135", "disabled": true },
+                                    { "complex": "M136", "disabled": true },
+                                    { "complex": "M137", "disabled": true }
+                                ]
+                            },
+                            {
+                                "complex": "OP4",
+                                "disabled": false,
+                                "subComplexes": [
+                                    { "complex": "M138", "disabled": true },
+                                    { "complex": "M139", "disabled": true },
+                                    { "complex": "M140", "disabled": true },
+                                    { "complex": "M141", "disabled": true },
+                                    { "complex": "M142", "disabled": true }
+                                ]
+                            },
+                            {
+                                "complex": "OP12",
+                                "disabled": false,
+                                "subComplexes": [
+                                    { "complex": "M213", "disabled": true },
+                                    { "complex": "M212", "disabled": true },
+                                    { "complex": "M216", "disabled": true },
+                                    { "complex": "M217", "disabled": true }
+                                ]
+                            },
+                            { "complex": "OP23", "disabled": false, "subComplexes": [] },
+                            { "complex": "OP25", "disabled": false, "subComplexes": [] }
+                        ],
+                        "mnr": [
+                            { "complex": "M143", "disabled": false },
+                            { "complex": "M144", "disabled": false },
+                            { "complex": "M145", "disabled": false },
+                            { "complex": "M146", "disabled": false }
+                        ]
+                    },
+                    "disabled": false
+                }
+            ]
+        },
+        {
+            "series": "2",
+            "sections": [
+                {
+                    "section": "1",
+                    "complexes": { "opus": [], "mnr": [] },
+                    "disabled": true
+                },
+                {
+                    "section": "2A",
+                    "complexes": {
+                        "opus": [],
+                        "mnr": [
+                            { "complex": "M22", "disabled": false },
+                            { "complex": "M30", "disabled": false },
+                            { "complex": "M31", "disabled": false },
+                            { "complex": "M34", "disabled": false },
+                            { "complex": "M35_42", "disabled": false },
+                            { "complex": "M37", "disabled": false }
+                        ]
+                    },
+                    "disabled": false
+                },
+                {
+                    "section": "2B",
+                    "complexes": { "opus": [], "mnr": [] },
+                    "disabled": true
+                },
+                {
+                    "section": "3",
+                    "complexes": { "opus": [], "mnr": [] },
+                    "disabled": true
+                },
+                {
+                    "section": "4",
+                    "complexes": { "opus": [], "mnr": [] },
+                    "disabled": true
+                },
+                {
+                    "section": "5",
+                    "complexes": { "opus": [], "mnr": [] },
+                    "disabled": true
+                }
+            ]
+        },
+        {
+            "series": "3",
+            "sections": [
+                {
+                    "section": "1",
+                    "complexes": { "opus": [], "mnr": [] },
+                    "disabled": true
+                },
+                {
+                    "section": "2",
+                    "complexes": { "opus": [], "mnr": [] },
+                    "disabled": true
+                },
+                {
+                    "section": "3",
+                    "complexes": { "opus": [], "mnr": [] },
+                    "disabled": true
+                },
+                {
+                    "section": "4",
+                    "complexes": { "opus": [], "mnr": [] },
+                    "disabled": true
+                },
+                {
+                    "section": "5",
+                    "complexes": { "opus": [], "mnr": [] },
+                    "disabled": true
+                }
+            ]
+        }
+    ]
+}

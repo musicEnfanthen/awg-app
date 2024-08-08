@@ -32,9 +32,9 @@ export interface EditionOutlineSection {
     section: EditionRouteConstant;
 
     /**
-     * The edition complexes of an edition section.
+     * The edition complex types of an edition section.
      */
-    complexes: EditionOutlineComplexTypes;
+    complexTypes: EditionOutlineComplexTypes;
 
     /**
      * Boolean flag if an edition section is disabled.
@@ -52,12 +52,12 @@ export interface EditionOutlineComplexTypes {
     /**
      * The opus parts of an edition complex.
      */
-    opus: EditionOutlineComplex[];
+    opus: EditionOutlineComplexItem[];
 
     /**
      * The mnr parts of an edition complex.
      */
-    mnr: EditionOutlineComplex[];
+    mnr: EditionOutlineComplexItem[];
 }
 
 /**
@@ -66,7 +66,7 @@ export interface EditionOutlineComplexTypes {
  * It is used in the context of the edition view
  * to structure outline information of an edition complex.
  */
-export interface EditionOutlineComplex {
+export interface EditionOutlineComplexItem {
     /**
      * The edition complex.
      */
@@ -76,4 +76,9 @@ export interface EditionOutlineComplex {
      * Boolean flag if an edition complex is disabled.
      */
     disabled: boolean;
+
+    /**
+     * The sub-complexes of an edition complex.
+     */
+    subComplexes?: EditionOutlineComplexItem[];
 }
