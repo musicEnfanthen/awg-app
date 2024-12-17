@@ -234,7 +234,7 @@
                                         "measure": "6 <br /> bis 7",
                                         "system": "Klav.",
                                         "position": "",
-                                        "comment": "Korrekturskizzen über, unter und nach den Systemen.  <br /> System 9–13:  <br /> ##Abbildung## <br /> System 15–18:  <br /> ##Abbildung## <br /> Siehe <a (click)=\"ref.selectSvgSheet({complexId: 'op3', sheetId: 'M_133_TF2'})\">Textfassung 2</a>."
+                                        "comment": "Korrekturskizzen über, unter und nach den Systemen.  <br /> System 9–13:  <br /> <img class='img-thumbnail' [src]=\"ref.CORRECTIONS['OP3']['SOURCE_AA_CORR_2']['T6_7A'].src\" /> ##Abbildung## <br /> System 15–18:  <br /> <img class='img-thumbnail' [src]=\"ref.CORRECTIONS['OP3']['SOURCE_AA_CORR_2']['T6_7B'].src\" /> ##Abbildung## <br /> Siehe <a (click)=\"ref.selectSvgSheet({complexId: 'op3', sheetId: 'M_133_TF2'})\">Textfassung 2</a>."
                                     },
                                     {
                                         "measure": "11",
@@ -388,19 +388,19 @@
                                         "measure": "3–5",
                                         "system": "Klav. u.",
                                         "position": "",
-                                        "comment": "Korrekturskizzen unter der Akkoalde (System 14–15): <br /> ##Abbildung## <br /> Siehe <a (click)=\"ref.selectSvgSheet({complexId: 'op3', sheetId: 'M_134_TF2'})\">Textfassung 2</a>."
+                                        "comment": "Korrekturskizzen unter der Akkoalde (System 14–15): <br /> <img class='img-thumbnail' [src]=\"ref.CORRECTIONS['OP3']['SOURCE_AB_CORR_2']['T3_5'].src\" /> ##Abbildung## <br /> Siehe <a (click)=\"ref.selectSvgSheet({complexId: 'op3', sheetId: 'M_134_TF2'})\">Textfassung 2</a>."
                                     },
                                     {
                                         "measure": "6",
                                         "system": "Klav. u.",
                                         "position": "5–11/16",
-                                        "comment": "Korrekturskizzen unter der Akkoalde (System 16–18): <br /> ##Abbildung## <br /> Siehe <a (click)=\"ref.selectSvgSheet({complexId: 'op3', sheetId: 'M_134_TF2'})\">Textfassung 2</a>."
+                                        "comment": "Korrekturskizzen unter der Akkoalde (System 16–18): <br /> <img class='img-thumbnail' [src]=\"ref.CORRECTIONS['OP3']['SOURCE_AB_CORR_2']['T6'].src\" /> ##Abbildung## <br /> Siehe <a (click)=\"ref.selectSvgSheet({complexId: 'op3', sheetId: 'M_134_TF2'})\">Textfassung 2</a>."
                                     },
                                     {
                                         "measure": "8",
                                         "system": "Klav.",
                                         "position": "9–16/16",
-                                        "comment": "Korrekturskizzen unter und nach der Akkoalde (System 4, 6): <br /> ##Abbildung##"
+                                        "comment": "Korrekturskizzen unter und nach der Akkoalde (System 4, 6): <br /> <img class='img-thumbnail' [src]=\"ref.CORRECTIONS['OP3']['SOURCE_AB_CORR_2']['T8'].src\" /> ##Abbildung##"
                                     },
                                     {
                                         "measure": "9",
@@ -412,7 +412,7 @@
                                         "measure": "10",
                                         "system": "Klav.",
                                         "position": "",
-                                        "comment": "Korrekturskizzen unter der Akkoalde (System 14–18): <br /> ##Abbildung## <br /> Siehe <a (click)=\"ref.selectSvgSheet({complexId: 'op3', sheetId: 'M_134_TF2'})\">Textfassung 2</a>."
+                                        "comment": "Korrekturskizzen unter der Akkoalde (System 14–18): <br /> <img class='img-thumbnail' [src]=\"ref.CORRECTIONS['OP3']['SOURCE_AB_CORR_2']['T10'].src\" /> ##Abbildung## <br /> Siehe <a (click)=\"ref.selectSvgSheet({complexId: 'op3', sheetId: 'M_134_TF2'})\">Textfassung 2</a>."
                                     }
                                 ]
                             }

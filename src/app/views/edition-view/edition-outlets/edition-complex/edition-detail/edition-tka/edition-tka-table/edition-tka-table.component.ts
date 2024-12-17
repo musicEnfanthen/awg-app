@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, inject, Input, Output } from '@angular/core';
+import { EDITION_CORRECTIONS_DATA } from '@awg-app/views/edition-view/data';
 import { EditionGlyphService } from '@awg-app/views/edition-view/services';
 
 import { TextcriticalCommentBlock, TkaTableHeaderColumn } from '@awg-views/edition-view/models';
@@ -103,6 +104,8 @@ export class EditionTkaTableComponent {
             { reference: 'comment', label: 'Anmerkung' },
         ],
     };
+
+    readonly CORRECTIONS = EDITION_CORRECTIONS_DATA;
 
     /**
      * Private readonly injection variable: _editionGlyphService.
