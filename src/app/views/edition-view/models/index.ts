@@ -38,6 +38,7 @@ import { Folio, FolioContent, FolioConvolute, FolioConvoluteList, FolioFormat, F
 import { Graph, GraphList, GraphRDFData, GraphSparqlQuery } from './graph.model';
 import { Intro, IntroBlock, IntroList } from './intro.model';
 import { Preface, PrefaceList } from './preface.model';
+import { SourceCorrectionsImage, SourceCorrectionsImagesList } from './source-corrections-images.model';
 
 import {
     SourceDescription,
@@ -106,6 +107,8 @@ export {
     Preface,
     PrefaceList,
     Source,
+    SourceCorrectionsImage,
+    SourceCorrectionsImagesList,
     SourceDescription,
     SourceDescriptionContent,
     SourceDescriptionList,

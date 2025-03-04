@@ -1,4 +1,6 @@
-@if (sourceDescriptionListData) {
+{{ corrImages | json }}
+
+@if (sourceDescriptionListData && CORR_IMAGES) {
     <div class="awg-source-description-list">
         @for (sourceDescription of sourceDescriptionListData.sources; track sourceDescription.id) {
             <div class="awg-source-description card mb-2" [id]="sourceDescription.id">

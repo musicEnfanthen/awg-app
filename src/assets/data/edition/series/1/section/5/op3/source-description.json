@@ -235,7 +235,7 @@
                                             "measure": "6 <br /> bis 7",
                                             "system": "Klav.",
                                             "position": "",
-                                            "comment": "Korrekturskizzen über, unter und nach den Systemen.  <br /> System 9–13:  <br /> ##Abbildung## <br /> System 15–18:  <br /> ##Abbildung## <br /> Siehe <a (click)=\"ref.selectSvgSheet({complexId: 'op3', sheetId: 'M_133_TF2'})\">Textfassung 2</a>."
+                                            "comment": "Korrekturskizzen über, unter und nach den Systemen.  <br /> System 9–13:  <br /> <img class='img-thumbnail' [src]=\"ref.CORR_IMAGES['source_Aa_corr_2']['T6_7A'].src\" />##Abbildung## <br /> System 15–18:  <br /> ##Abbildung## <br /> Siehe <a (click)=\"ref.selectSvgSheet({complexId: 'op3', sheetId: 'M_133_TF2'})\">Textfassung 2</a>."
                                         },
                                         {
                                             "measure": "11",

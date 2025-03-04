@@ -36,6 +36,7 @@
                             @if (editionReportData[1]) {
                                 <awg-source-description
                                     [sourceDescriptionListData]="editionReportData[1]"
+                                    [corrImages]="editionReportData[2]"
                                     (navigateToReportFragmentRequest)="onReportFragmentNavigate($event)"
                                     (openModalRequest)="onModalOpen($event)"
                                     (selectSvgSheetRequest)="onSvgSheetSelect($event)">
@@ -56,7 +57,7 @@
                             @if (editionReportData[2]) {
                                 <awg-source-evaluation
                                     [editionComplex]="editionComplex"
-                                    [sourceEvaluationListData]="editionReportData[2]"
+                                    [sourceEvaluationListData]="editionReportData[3]"
                                     (navigateToReportFragmentRequest)="onReportFragmentNavigate($event)"
                                     (openModalRequest)="onModalOpen($event)"
                                     (selectSvgSheetRequest)="onSvgSheetSelect($event)">
@@ -76,7 +77,7 @@
                         <ng-template>
                             @if (editionReportData[3]) {
                                 <awg-textcritics-list
-                                    [textcriticsData]="editionReportData[3]"
+                                    [textcriticsData]="editionReportData[4]"
                                     (navigateToReportFragmentRequest)="onReportFragmentNavigate($event)"
                                     (openModalRequest)="onModalOpen($event)"
                                     (selectSvgSheetRequest)="onSvgSheetSelect($event)">

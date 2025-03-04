@@ -1,8 +1,17 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import {
+    ChangeDetectionStrategy,
+    Component,
+    EventEmitter,
+    Input,
+    OnChanges,
+    Output,
+    SimpleChanges,
+} from '@angular/core';
 
 import { UtilityService } from '@awg-core/services';
 import { EDITION_FIRM_SIGNS_DATA } from '@awg-views/edition-view/data';
 import {
+    SourceCorrectionsImagesList,
     SourceDescriptionList,
     SourceDescriptionWritingInstruments,
     SourceDescriptionWritingMaterialDimension,
@@ -25,7 +34,7 @@ import {
     changeDetection: ChangeDetectionStrategy.OnPush,
     standalone: false,
 })
-export class SourceDescriptionComponent {
+export class SourceDescriptionComponent implements OnChanges {
     /**
      * Input variable: sourceDescriptionListData.
      *
@@ -33,6 +42,14 @@ export class SourceDescriptionComponent {
      */
     @Input()
     sourceDescriptionListData: SourceDescriptionList;
+
+    /**
+     * Input variable: sourceCorrectionsImagesListData.
+     *
+     * It keeps the source corrections images list data.
+     */
+    @Input()
+    corrImages: SourceCorrectionsImagesList;
 
     /**
      * Output variable: navigateToReportFragment.
@@ -59,6 +76,8 @@ export class SourceDescriptionComponent {
     @Output()
     selectSvgSheetRequest: EventEmitter<{ complexId: string; sheetId: string }> = new EventEmitter();
 
+    CORR_IMAGES: SourceCorrectionsImagesList = new SourceCorrectionsImagesList();
+
     /**
      * Readonly variable: FIRM_SIGNS.
      *
@@ -81,6 +100,12 @@ export class SourceDescriptionComponent {
      */
     constructor(public utils: UtilityService) {
         this.ref = this;
+    }
+
+    ngOnChanges(changes: SimpleChanges): void {
+        if (changes['corrImages']) {
+            this.CORR_IMAGES = this.corrImages;
+        }
     }
 
     /**

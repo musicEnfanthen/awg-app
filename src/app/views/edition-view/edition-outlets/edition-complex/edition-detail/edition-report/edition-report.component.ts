@@ -8,6 +8,7 @@ import { ModalComponent } from '@awg-shared/modal/modal.component';
 import { EDITION_ROUTE_CONSTANTS } from '@awg-views/edition-view/edition-route-constants';
 import {
     EditionComplex,
+    SourceCorrectionsImagesList,
     SourceDescriptionList,
     SourceEvaluationList,
     SourceList,
@@ -49,7 +50,9 @@ export class EditionReportComponent implements OnInit {
      *
      * Observable that keeps the report data.
      */
-    editionReportData$: Observable<(SourceList | SourceDescriptionList | SourceEvaluationList | TextcriticsList)[]>;
+    editionReportData$: Observable<
+        (SourceList | SourceDescriptionList | SourceCorrectionsImagesList | SourceEvaluationList | TextcriticsList)[]
+    >;
 
     /**
      * Public variable: errorObject.

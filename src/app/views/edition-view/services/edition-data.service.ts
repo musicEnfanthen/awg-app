@@ -14,6 +14,7 @@ import {
     GraphList,
     IntroList,
     PrefaceList,
+    SourceCorrectionsImagesList,
     SourceDescriptionList,
     SourceEvaluationList,
     SourceList,
@@ -149,16 +150,21 @@ export class EditionDataService {
      */
     getEditionReportData(
         editionComplex: EditionComplex
-    ): Observable<(SourceList | SourceDescriptionList | SourceEvaluationList | TextcriticsList)[]> {
+    ): Observable<
+        (SourceList | SourceDescriptionList | SourceCorrectionsImagesList | SourceEvaluationList | TextcriticsList)[]
+    > {
         this._assetPath = this._setAssetPathForEditionComplex(editionComplex);
         const sourceListData$: Observable<SourceList> = this._getSourceListData();
         const sourceDescriptionListData$: Observable<SourceDescriptionList> = this._getSourceDescriptionListData();
+        const sourceCorrectionsImagesListData$: Observable<SourceCorrectionsImagesList> =
+            this._getSourceCorrectionsImagesListData();
         const sourceEvaluationListData$: Observable<SourceEvaluationList> = this._getSourceEvaluationListData();
         const textciticsListData$: Observable<TextcriticsList> = this._getTextcriticsListData();
 
         return observableForkJoin([
             sourceListData$,
             sourceDescriptionListData$,
+            sourceCorrectionsImagesListData$,
             sourceEvaluationListData$,
             textciticsListData$,
         ]).pipe(
@@ -166,6 +172,7 @@ export class EditionDataService {
             defaultIfEmpty([
                 new SourceList(),
                 new SourceDescriptionList(),
+                new SourceCorrectionsImagesList(),
                 new SourceEvaluationList(),
                 new TextcriticsList(),
             ]),
@@ -401,6 +408,21 @@ export class EditionDataService {
      */
     private _getSourceEvaluationListData(): Observable<SourceEvaluationList> {
         const file = EDITION_ASSETS_DATA.FILES.sourceEvaluationListFile;
+        const url = `${this._assetPath}/${file}`;
+        return this._getJsonData(url);
+    }
+
+    /**
+     * Private method: _getSourceCorrectionsListData.
+     *
+     * It sets the path to the JSON file with
+     * the source corrections images list data and triggers
+     * the method to get the JSON data.
+     *
+     * @returns {Observable<SourceCorrectionsImagesList>} The observable with the SourceCorrectionsImagesList data.
+     */
+    private _getSourceCorrectionsImagesListData(): Observable<SourceCorrectionsImagesList> {
+        const file = EDITION_ASSETS_DATA.FILES.sourceCorrectionsImagesFile;
         const url = `${this._assetPath}/${file}`;
         return this._getJsonData(url);
     }
