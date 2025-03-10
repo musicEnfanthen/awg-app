@@ -11,8 +11,20 @@
                 </div>
                 <div ngbAccordionCollapse>
                     <div ngbAccordionBody>
-                        <ng-template
-                            ><p>
+                        <ng-template>
+                            <p>
+                                <a
+                                    class="awg-edition-info-item-link"
+                                    [routerLink]="[
+                                        editionRouteConstants.EDITION.route,
+                                        editionRouteConstants.PREFACE.route,
+                                    ]"
+                                    ><span class="awg-edition-info-item-title">{{
+                                        editionRouteConstants.PREFACE.full
+                                    }}</span></a
+                                >
+                            </p>
+                            <p>
                                 <a
                                     class="awg-edition-info-item-link"
                                     [routerLink]="[
@@ -41,10 +53,10 @@
                                     class="awg-edition-info-item-link"
                                     [routerLink]="[
                                         editionRouteConstants.EDITION.route,
-                                        editionRouteConstants.PREFACE.route,
+                                        editionRouteConstants.TRADEMARKS.route,
                                     ]"
                                     ><span class="awg-edition-info-item-title">{{
-                                        editionRouteConstants.PREFACE.full
+                                        editionRouteConstants.TRADEMARKS.full
                                     }}</span></a
                                 >
                             </p>

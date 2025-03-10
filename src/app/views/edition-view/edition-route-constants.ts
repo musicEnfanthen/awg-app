@@ -104,6 +104,15 @@ export class EDITION_ROUTE_CONSTANTS {
     };
 
     /**
+     * The route constant for the trademarks catalog.
+     */
+    static readonly TRADEMARKS: EditionRouteConstant = {
+        route: 'trademarks',
+        short: 'Firmenzeichen',
+        full: 'Firmenzeichen (Katalog)',
+    };
+
+    /**
      * The route constant for an edition complex.
      */
     static readonly COMPLEX: EditionRouteConstant = {

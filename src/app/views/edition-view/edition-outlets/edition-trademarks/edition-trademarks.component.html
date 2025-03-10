@@ -1,0 +1,102 @@
+@if (filteredTrademarksCatalog) {
+    <div class="container">
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <label for="id-filter">Filter by ID:</label>
+                <input
+                    id="id-filter"
+                    type="text"
+                    [(ngModel)]="idFilter"
+                    class="form-control"
+                    (ngModelChange)="filterCatalog()" />
+            </div>
+            <div class="col-md-3">
+                <label for="systems-filter">Filter by Systems:</label>
+                <input
+                    id="systems-filter"
+                    type="text"
+                    [(ngModel)]="systemsFilter"
+                    class="form-control"
+                    (ngModelChange)="filterCatalog()" />
+            </div>
+            <div class="col-md-3">
+                <label for="description-filter">Filter by Description:</label>
+                <input
+                    id="description-filter"
+                    type="text"
+                    [(ngModel)]="descriptionFilter"
+                    class="form-control"
+                    (ngModelChange)="filterCatalog()" />
+            </div>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th scope="col">Bild</th>
+                    <th scope="col">Typ</th>
+                    <th scope="col">Systeme</th>
+                    <th scope="col">Beschreibung</th>
+                    <th scope="col">verwendet in:</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (trademark of filteredTrademarksCatalog; track trademark) {
+                    <tr>
+                        <td class="text-center">
+                            <img class="img-thumbnail" [src]="trademark.route" alt="{{ trademark.short }}" />
+                        </td>
+                        <td class="text-center">{{ trademark.short }}</td>
+                        <td class="text-center">
+                            <span class="badge bg-secondary mb-2">{{ trademark.systems }}</span>
+                        </td>
+                        <td>{{ trademark.description }}</td>
+                        <td class="text-center">
+                            <span class="badge bg-info mb-2">{{ trademark.variant }}</span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- @for (trademarkGroup of trademarksCatalog | keyvalue | groupByType; track trademarkGroup) {
+        <div class="para p-3 shadow border rounded-3 mb-4">
+            <h5 class="type-heading border-bottom pb-2 mb-3">{{ trademarkGroup.type }}</h5>
+            <div class="awg-edition-trademarks-grid row row-cols-1 row-cols-md-3 row-cols-xl-4 g-4">
+                @for (trademark of trademarkGroup.trademarks; track trademark) {
+                    <div class="col">
+                        <div class="card awg-edition-trademark-card h-100 shadow hover-card">
+                            <div class="row g-0">
+                                <div class="col-4 col-md-4 awg-img-container">
+                                    <img
+                                        class="img-fluid rounded-start"
+                                        [src]="trademark.value.route"
+                                        [alt]="trademark.value.short"
+                                        [title]="trademark.value.full" />
+                                </div>
+                                <div class="col-md-8 d-flex flex-column awg-edition-trademark-content">
+                                    <div class="card-body flex-grow-1">
+                                        <h5 class="card-title">{{ trademark.value.short }}</h5>
+                                        <span class="badge bg-info mb-2">
+                                            {{ getVariant(trademark.key) }}
+                                        </span>
+                                        <span class="badge bg-secondary mb-2">
+                                            {{ getSystems(trademark.key) }}
+                                        </span>
+                                        <details [id]="trademark.key">
+                                            <summary>Beschreibung:</summary>
+                                            <p>{{ trademark.value.full }}</p>
+                                        </details>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    } -->
+}

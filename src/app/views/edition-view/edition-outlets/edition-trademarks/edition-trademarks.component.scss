@@ -1,0 +1,28 @@
+.card-title {
+    font-size: 1.25rem;
+}
+.card-subtitle {
+    font-size: 1rem;
+    font-weight: 500;
+}
+.card-text {
+    font-size: 0.875rem;
+}
+
+.hover-card {
+    transition:
+        transform 0.3s,
+        box-shadow 0.3s;
+}
+.hover-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+th {
+    min-width: 100px;
+}
+
+.type-heading {
+    text-transform: uppercase;
+}

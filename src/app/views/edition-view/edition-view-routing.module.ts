@@ -36,6 +36,13 @@ const EDITION_VIEW_ROUTES: Routes = [
                     ),
             },
             {
+                path: 'trademarks',
+                loadChildren: () =>
+                    import('./edition-outlets/edition-trademarks/edition-trademarks.module').then(
+                        m => m.EditionTrademarksModule
+                    ),
+            },
+            {
                 // Overview of series.
                 path: 'series',
                 component: EditionSeriesComponent,
