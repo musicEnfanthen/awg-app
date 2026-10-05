@@ -6,17 +6,59 @@
         <div ngbAccordionCollapse>
             <div ngbAccordionBody>
                 <ng-template>
-                    <!-- folios label -->
-                    <div class="awg-edition-folios-panel-label">
-                        <p>
-                            <a [routerLink]="['../report']" [fragment]="reportFragment()">{{
-                                selectedConvolute().convoluteLabel
-                            }}</a>
-                        </p>
+                    <div class="awg-edition-folios-panel-header">
+                        <!-- folios label -->
+                        <div class="awg-edition-folios-panel-label">
+                            <p>
+                                <a [routerLink]="['../report']" [fragment]="reportFragment()">{{
+                                    selectedConvolute().convoluteLabel
+                                }}</a>
+                            </p>
+                        </div>
+
+                        <!-- view mode switch (prototypes) -->
+                        <div class="awg-edition-folios-panel-view-switch btn-group" role="group" aria-label="Ansicht">
+                            @for (option of viewOptions; track option.mode) {
+                                <input
+                                    type="radio"
+                                    class="btn-check"
+                                    name="awg-edition-folios-view-mode"
+                                    autocomplete="off"
+                                    [id]="'awg-edition-folios-view-' + option.mode"
+                                    [checked]="viewMode() === option.mode"
+                                    (change)="viewMode.set(option.mode)" />
+                                <label
+                                    class="btn btn-sm btn-outline-info"
+                                    [for]="'awg-edition-folios-view-' + option.mode"
+                                    [ngbTooltip]="option.label"
+                                    ><fa-icon [icon]="option.icon" />
+                                    <span class="visually-hidden">{{ option.label }}</span>
+                                </label>
+                            }
+                        </div>
                     </div>
 
-                    <!-- folios viewer -->
-                    <awg-edition-folios-viewer [folios]="folios()" [selectedSvgSheet]="selectedSvgSheet()" />
+                    <!-- folios views -->
+                    @switch (viewMode()) {
+                        @case ('paging') {
+                            <awg-edition-folios-paging
+                                [selectedConvolute]="selectedConvolute()"
+                                [selectedSvgSheet]="selectedSvgSheet()" />
+                        }
+                        @case ('flip') {
+                            <awg-edition-folios-flip
+                                [selectedConvolute]="selectedConvolute()"
+                                [selectedSvgSheet]="selectedSvgSheet()" />
+                        }
+                        @case ('systemMap') {
+                            <awg-edition-folios-system-map
+                                [selectedConvolute]="selectedConvolute()"
+                                [selectedSvgSheet]="selectedSvgSheet()" />
+                        }
+                        @default {
+                            <awg-edition-folios-viewer [folios]="folios()" [selectedSvgSheet]="selectedSvgSheet()" />
+                        }
+                    }
 
                     <!-- folios legend -->
                     <awg-edition-folios-legend class="col-12" />

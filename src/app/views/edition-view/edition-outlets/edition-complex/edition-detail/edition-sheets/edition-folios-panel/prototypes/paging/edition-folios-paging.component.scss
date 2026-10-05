@@ -1,0 +1,93 @@
+.awg-edition-folios-paging {
+    margin-bottom: 2em;
+    padding: 1em;
+    border: 1px solid #eeeeee;
+    box-shadow: 5px 5px 6px #cccccc;
+    border-radius: 4px;
+
+    &:focus-visible {
+        outline: 2px solid olivedrab;
+        outline-offset: 2px;
+    }
+}
+
+.awg-edition-folios-paging-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1em;
+    margin-bottom: 0.5em;
+}
+
+.awg-edition-folios-paging-counter {
+    min-width: 9em;
+    text-align: center;
+}
+
+.awg-edition-folios-paging-stage {
+    display: flex;
+    justify-content: center;
+    // Subtle light table
+    background: radial-gradient(ellipse at center, #fdfdf8 0%, #f1f1ea 100%);
+    border-radius: 4px;
+    padding: 1em;
+}
+
+.awg-edition-folios-paging-current {
+    display: block;
+    width: min(100%, 560px);
+    animation: awg-folio-fade-in 250ms ease-out;
+}
+
+@keyframes awg-folio-fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+.awg-edition-folios-paging-filmstrip {
+    display: flex;
+    gap: 0.5em;
+    justify-content: center;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    margin-top: 1em;
+    padding: 0.25em;
+}
+
+.awg-edition-folios-paging-thumb {
+    flex: 0 0 auto;
+    width: 90px;
+    padding: 2px;
+    background: white;
+    border: 2px solid transparent;
+    border-radius: 4px;
+    opacity: 0.6;
+    transition:
+        opacity 150ms,
+        border-color 150ms,
+        transform 150ms;
+
+    // The thumbnail only selects the folio, the segments are not clickable here
+    awg-edition-folios-viewer-svg {
+        display: block;
+        pointer-events: none;
+        font-size: 0.7em;
+    }
+
+    &:hover,
+    &:focus-visible {
+        opacity: 1;
+        transform: translateY(-2px);
+    }
+
+    &.active {
+        opacity: 1;
+        border-color: olivedrab;
+    }
+}
