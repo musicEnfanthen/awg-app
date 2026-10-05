@@ -1,0 +1,58 @@
+<!-- Edition Folios Flip (prototype) -->
+@let leafList = leaves();
+@if (leafList.length > 0) {
+    <div class="awg-edition-folios-flip">
+        @if (turnableLeafIds().length > 0) {
+            <div class="awg-edition-folios-flip-toolbar">
+                <button type="button" class="btn btn-sm btn-outline-secondary" (click)="toggleAll()">
+                    <fa-icon [icon]="faRotate" /> {{ allTurned() ? 'Alle Recto zeigen' : 'Alle Verso zeigen' }}
+                </button>
+            </div>
+        }
+
+        <div class="awg-edition-folios-flip-grid">
+            @for (leaf of leafList; track leaf.id) {
+                @let turned = turnedLeafIds().has(leaf.id);
+                @let turnable = !!(leaf.recto && leaf.verso);
+
+                <figure class="awg-edition-folios-flip-leaf">
+                    <div class="awg-edition-folios-flip-card" [class.turned]="turned">
+                        <!-- front: recto (or the only side) -->
+                        @let front = leaf.recto ?? leaf.verso;
+                        @if (front) {
+                            <div class="awg-edition-folios-flip-face front" [attr.aria-hidden]="turned">
+                                <span class="awg-edition-folios-flip-badge">{{ leaf.recto ? 'recto' : 'verso' }}</span>
+                                <awg-edition-folios-viewer-svg
+                                    [folio]="front"
+                                    [selectedSvgSheet]="selectedSvgSheet()" />
+                            </div>
+                        }
+                        <!-- back: verso -->
+                        @if (turnable && leaf.verso) {
+                            <div class="awg-edition-folios-flip-face back" [attr.aria-hidden]="!turned">
+                                <span class="awg-edition-folios-flip-badge">verso</span>
+                                <awg-edition-folios-viewer-svg
+                                    [folio]="leaf.verso"
+                                    [selectedSvgSheet]="selectedSvgSheet()" />
+                            </div>
+                        }
+                    </div>
+
+                    <figcaption class="awg-edition-folios-flip-caption">
+                        <span>Bl. {{ leaf.id }}</span>
+                        @if (turnable) {
+                            <button
+                                type="button"
+                                class="btn btn-sm btn-link"
+                                [attr.aria-label]="'Bl. ' + leaf.id + ' wenden'"
+                                [attr.aria-pressed]="turned"
+                                (click)="toggleLeaf(leaf.id)">
+                                <fa-icon [icon]="faRotate" /> wenden
+                            </button>
+                        }
+                    </figcaption>
+                </figure>
+            }
+        </div>
+    </div>
+}

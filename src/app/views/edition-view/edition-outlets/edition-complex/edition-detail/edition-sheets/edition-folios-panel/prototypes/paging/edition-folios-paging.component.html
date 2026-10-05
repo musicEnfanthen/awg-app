@@ -1,0 +1,63 @@
+<!-- Edition Folios Paging (prototype) -->
+@let folioList = folios();
+@let folio = currentFolio();
+@if (folio) {
+    <div
+        class="awg-edition-folios-paging"
+        role="region"
+        aria-label="Folios blättern (Pfeiltasten links/rechts)"
+        tabindex="0"
+        (keydown.arrowleft)="previous()"
+        (keydown.arrowright)="next()">
+        <!-- header with paging buttons -->
+        <div class="awg-edition-folios-paging-header">
+            <button
+                type="button"
+                class="btn btn-sm btn-outline-secondary"
+                aria-label="Vorheriges Folio"
+                [disabled]="folioList.length < 2"
+                (click)="previous()">
+                <fa-icon [icon]="faChevronLeft" />
+            </button>
+            <span class="awg-edition-folios-paging-counter">
+                Bl. <strong>{{ folio.folioId }}</strong>
+                <span class="text-muted">· {{ currentIndex() + 1 }} / {{ folioList.length }}</span>
+            </span>
+            <button
+                type="button"
+                class="btn btn-sm btn-outline-secondary"
+                aria-label="Nächstes Folio"
+                [disabled]="folioList.length < 2"
+                (click)="next()">
+                <fa-icon [icon]="faChevronRight" />
+            </button>
+        </div>
+
+        <!-- stage with the current folio (recreated per folio for the fade-in) -->
+        <div class="awg-edition-folios-paging-stage">
+            @for (currentFolio of [folio]; track currentFolio.folioId) {
+                <awg-edition-folios-viewer-svg
+                    class="awg-edition-folios-paging-current"
+                    [folio]="currentFolio"
+                    [selectedSvgSheet]="selectedSvgSheet()" />
+            }
+        </div>
+
+        <!-- filmstrip with all folios -->
+        @if (folioList.length > 1) {
+            <div class="awg-edition-folios-paging-filmstrip">
+                @for (thumbFolio of folioList; track thumbFolio.folioId; let index = $index) {
+                    <button
+                        type="button"
+                        class="awg-edition-folios-paging-thumb"
+                        [class.active]="index === currentIndex()"
+                        [attr.aria-current]="index === currentIndex() ? 'true' : null"
+                        [attr.aria-label]="'Bl. ' + thumbFolio.folioId"
+                        (click)="goTo(index)">
+                        <awg-edition-folios-viewer-svg [folio]="thumbFolio" [selectedSvgSheet]="selectedSvgSheet()" />
+                    </button>
+                }
+            </div>
+        }
+    </div>
+}

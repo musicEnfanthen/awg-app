@@ -1,13 +1,38 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
-import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { faBookOpen, faChartGantt, faRotate, faTableCells, IconDefinition } from '@fortawesome/free-solid-svg-icons';
+import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap/accordion';
+import { NgbTooltip } from '@ng-bootstrap/ng-bootstrap/tooltip';
 
 import { EditionSvgSheetSelection } from '@awg-views/edition-view/models/edition-svg-sheets.model';
 import { Folio, FolioConvolute } from '@awg-views/edition-view/models/folio.model';
 
 import { EditionFoliosLegendComponent } from './legend/edition-folios-legend.component';
+import { EditionFoliosFlipComponent } from './prototypes/flip/edition-folios-flip.component';
+import { EditionFoliosPagingComponent } from './prototypes/paging/edition-folios-paging.component';
+import { EditionFoliosSystemMapComponent } from './prototypes/system-map/edition-folios-system-map.component';
 import { EditionFoliosViewerComponent } from './viewer/edition-folios-viewer.component';
+
+/**
+ * The FoliosViewMode type.
+ *
+ * It holds the available view modes of the folios panel
+ * (`grid` is the default viewer, the others are design prototypes).
+ */
+type FoliosViewMode = 'grid' | 'paging' | 'flip' | 'systemMap';
+
+/**
+ * The FoliosViewOption interface.
+ *
+ * It holds a view mode of the folios panel with its label and icon.
+ */
+interface FoliosViewOption {
+    mode: FoliosViewMode;
+    label: string;
+    icon: IconDefinition;
+}
 
 /**
  * The EditionFoliosPanel component.
@@ -22,7 +47,17 @@ import { EditionFoliosViewerComponent } from './viewer/edition-folios-viewer.com
     templateUrl: './edition-folios-panel.component.html',
     styleUrls: ['./edition-folios-panel.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [EditionFoliosLegendComponent, EditionFoliosViewerComponent, NgbAccordionModule, RouterLink],
+    imports: [
+        EditionFoliosFlipComponent,
+        EditionFoliosLegendComponent,
+        EditionFoliosPagingComponent,
+        EditionFoliosSystemMapComponent,
+        EditionFoliosViewerComponent,
+        FaIconComponent,
+        NgbAccordionModule,
+        NgbTooltip,
+        RouterLink,
+    ],
 })
 export class EditionFoliosPanelComponent {
     /**
@@ -53,4 +88,23 @@ export class EditionFoliosPanelComponent {
      * of the selected convolute in the critical report.
      */
     readonly reportFragment = computed<string>(() => `source_${this.selectedConvolute().convoluteId}`);
+
+    /**
+     * Readonly variable: viewOptions.
+     *
+     * It holds the selectable view modes of the folios panel.
+     */
+    readonly viewOptions: FoliosViewOption[] = [
+        { mode: 'grid', label: 'Raster', icon: faTableCells },
+        { mode: 'paging', label: 'Blättern', icon: faBookOpen },
+        { mode: 'flip', label: 'Wenden', icon: faRotate },
+        { mode: 'systemMap', label: 'Systemkarte', icon: faChartGantt },
+    ];
+
+    /**
+     * Readonly signal: viewMode.
+     *
+     * It holds the selected view mode of the folios panel.
+     */
+    readonly viewMode = signal<FoliosViewMode>('grid');
 }

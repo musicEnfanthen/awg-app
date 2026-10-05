@@ -1,0 +1,73 @@
+.awg-edition-folios-system-map {
+    margin-bottom: 2em;
+    padding: 1em;
+    overflow-x: auto;
+    border: 1px solid #eeeeee;
+    box-shadow: 5px 5px 6px #cccccc;
+}
+
+.awg-edition-folios-system-map-svg {
+    display: block;
+    margin: 0 auto;
+    font-family: 'Source Sans Pro', source-sans-pro, sans-serif;
+}
+
+.awg-system-map-axis-label {
+    font-size: 9px;
+    fill: #a3a3a3;
+}
+
+.awg-system-map-column-header {
+    font-size: 12px;
+    fill: #555555;
+}
+
+.awg-system-map-row {
+    fill: #f7f7f7;
+
+    &.odd {
+        fill: #efefef;
+    }
+}
+
+.awg-system-map-bar {
+    cursor: pointer;
+    outline: none;
+    transition: opacity 150ms;
+
+    .awg-system-map-bar-shape {
+        fill: #dddddd;
+        stroke: grey;
+        stroke-width: 1;
+        transition:
+            fill 150ms,
+            stroke-width 150ms;
+    }
+
+    &.selectable .awg-system-map-bar-shape {
+        fill: #ffe3b3;
+        stroke: orange;
+    }
+
+    &.active .awg-system-map-bar-shape {
+        fill: #d9e8b8;
+        stroke: olivedrab;
+        stroke-width: 2;
+    }
+
+    &.highlighted .awg-system-map-bar-shape,
+    &:focus-visible .awg-system-map-bar-shape {
+        stroke-width: 2.5;
+    }
+
+    .awg-system-map-bar-label {
+        font-size: 10px;
+        fill: #333333;
+        pointer-events: none;
+    }
+}
+
+// While hovering, dim all bars that do not share the hovered sigle
+.has-hover .awg-system-map-bar:not(.highlighted) {
+    opacity: 0.35;
+}
