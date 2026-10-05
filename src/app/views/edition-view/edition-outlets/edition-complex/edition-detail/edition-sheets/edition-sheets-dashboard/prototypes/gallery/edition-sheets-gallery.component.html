@@ -1,0 +1,111 @@
+<!-- Edition Sheets Gallery (prototype) -->
+<div class="awg-edition-sheets-gallery">
+    <!-- toolbar: search and filters -->
+    <div class="awg-edition-sheets-gallery-toolbar">
+        <div class="input-group input-group-sm awg-edition-sheets-gallery-search">
+            <span class="input-group-text"><fa-icon [icon]="faMagnifyingGlass" /></span>
+            <input
+                type="search"
+                class="form-control"
+                placeholder="Sigle suchen, z. B. Sk2.1"
+                aria-label="Notentexte durchsuchen"
+                [value]="query()"
+                (input)="onQueryInput($event)" />
+        </div>
+
+        <div class="awg-edition-sheets-gallery-chips" role="group" aria-label="Editionstyp">
+            <button
+                type="button"
+                class="btn btn-sm rounded-pill"
+                [class]="typeFilter() === 'all' ? 'btn-secondary' : 'btn-outline-secondary'"
+                [attr.aria-pressed]="typeFilter() === 'all'"
+                (click)="typeFilter.set('all')">
+                Alle
+            </button>
+            @for (option of typeOptions(); track option.editionType) {
+                <button
+                    type="button"
+                    class="btn btn-sm rounded-pill"
+                    [class]="typeFilter() === option.editionType ? 'btn-secondary' : 'btn-outline-secondary'"
+                    [attr.aria-pressed]="typeFilter() === option.editionType"
+                    (click)="typeFilter.set(option.editionType)">
+                    {{ option.label }} <span class="badge text-bg-light">{{ option.count }}</span>
+                </button>
+            }
+        </div>
+
+        <div class="form-check form-switch mb-0">
+            <input
+                id="awg-edition-sheets-gallery-only-commented"
+                type="checkbox"
+                class="form-check-input"
+                role="switch"
+                [checked]="onlyCommented()"
+                (change)="onlyCommented.set(!onlyCommented())" />
+            <label class="form-check-label small" for="awg-edition-sheets-gallery-only-commented"
+                >nur mit Kommentaren</label
+            >
+        </div>
+    </div>
+
+    <!-- sections with cards -->
+    @for (section of sections(); track section.editionType) {
+        <section class="awg-edition-sheets-gallery-section">
+            <h6 class="awg-edition-sheets-gallery-section-title">
+                {{ section.label }} <span class="text-muted">({{ section.sheets.length }})</span>
+            </h6>
+
+            <div class="awg-edition-sheets-gallery-grid">
+                @for (sheet of section.sheets; track sheet.id) {
+                    @let isActive = sheet.id === activeSheetId();
+                    <article
+                        class="card awg-edition-sheets-gallery-card"
+                        tabindex="0"
+                        role="link"
+                        [class.active]="isActive"
+                        [attr.aria-current]="isActive ? 'true' : null"
+                        [attr.aria-label]="sheet.label + ' öffnen'"
+                        (awgClick)="openSheet(sheet)">
+                        <div class="awg-edition-sheets-gallery-thumb">
+                            @if (sheet.thumbnailSvg) {
+                                <img [src]="sheet.thumbnailSvg" alt="" loading="lazy" decoding="async" />
+                            }
+                            @if (sheet.partialCount > 1) {
+                                <span class="awg-edition-sheets-gallery-stack" title="Teile">
+                                    <fa-icon [icon]="faLayerGroup" /> {{ sheet.partialCount }}
+                                </span>
+                            }
+                        </div>
+                        <div class="card-body">
+                            <p class="awg-edition-sheets-gallery-label">{{ sheet.label }}</p>
+                            <div class="awg-edition-sheets-gallery-meta">
+                                @for (location of sheet.folioLocations; track location.convoluteId) {
+                                    <span class="text-muted" [title]="location.convoluteLabel"
+                                        >{{ location.convoluteId }} · Bl.
+                                        @for (folio of location.folios; track folio.folioId; let isLast = $last) {
+                                            {{ folio.folioId }}{{ isLast ? '' : ', ' }}
+                                        }
+                                    </span>
+                                }
+                            </div>
+                            <div class="awg-edition-sheets-gallery-badges">
+                                @if (sheet.commentCount > 0) {
+                                    <span class="badge text-bg-info" title="Textkritische Kommentare"
+                                        ><fa-icon [icon]="faComment" /> {{ sheet.commentCount }}</span
+                                    >
+                                }
+                                @if (sheet.hasRowtable) {
+                                    <span class="badge text-bg-secondary" title="Reihentabelle"
+                                        ><fa-icon [icon]="faTableList" /> RT</span
+                                    >
+                                }
+                            </div>
+                        </div>
+                    </article>
+                }
+            </div>
+        </section>
+    } @empty {
+        <p class="text-muted fst-italic">Keine Notentexte gefunden.</p>
+    }
+</div>

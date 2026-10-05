@@ -1,0 +1,103 @@
+.awg-edition-sheets-cockpit {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    grid-auto-flow: dense;
+    gap: 0.75rem;
+}
+
+.awg-edition-sheets-cockpit-tile {
+    .card-header {
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+}
+
+.awg-edition-sheets-cockpit-hero {
+    grid-row: span 2;
+    border-color: var(--bs-info);
+}
+
+.awg-edition-sheets-cockpit-preview {
+    height: 12rem;
+    background-color: #fff;
+    border-bottom: 1px solid var(--bs-border-color);
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        padding: 0.5rem;
+    }
+}
+
+.awg-edition-sheets-cockpit-paging {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.awg-edition-sheets-cockpit-kpis {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+}
+
+.awg-edition-sheets-cockpit-kpi {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: baseline;
+    column-gap: 0.5rem;
+    color: var(--bs-secondary-color);
+
+    .awg-edition-sheets-cockpit-kpi-value {
+        color: var(--bs-body-color);
+        font-weight: 600;
+        font-size: 1.5rem;
+        line-height: 1;
+    }
+
+    .awg-edition-sheets-cockpit-kpi-label {
+        grid-column: 2;
+        font-size: 0.75rem;
+    }
+}
+
+.awg-edition-sheets-cockpit-location {
+    grid-column: span 2;
+
+    @media (width < 768px) {
+        grid-column: auto;
+    }
+}
+
+.awg-edition-sheets-cockpit-folios {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.awg-edition-sheets-cockpit-folio {
+    width: 10rem;
+    margin: 0;
+}
+
+.awg-edition-sheets-cockpit-relations {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    > div {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.25rem;
+    }
+}
+
+.awg-edition-sheets-cockpit-relations-label {
+    width: 100%;
+    color: var(--bs-secondary-color);
+    font-size: 0.75rem;
+}

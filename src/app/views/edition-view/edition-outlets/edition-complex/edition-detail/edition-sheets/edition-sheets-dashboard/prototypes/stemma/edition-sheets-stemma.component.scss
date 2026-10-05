@@ -1,0 +1,102 @@
+$indent: 1.1rem;
+
+.awg-edition-sheets-stemma-lineage {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    margin-bottom: 0.75rem;
+    padding: 0.35rem 0.75rem;
+    border-left: 3px solid var(--bs-info);
+    background-color: var(--bs-tertiary-bg);
+    font-size: 0.875rem;
+}
+
+.awg-edition-sheets-stemma-lineage-link {
+    cursor: pointer;
+}
+
+.awg-edition-sheets-stemma-board {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+    align-items: start;
+    gap: 0.75rem;
+}
+
+.awg-edition-sheets-stemma-group-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    border: 0;
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-align: start;
+}
+
+.awg-edition-sheets-stemma-targets {
+    border-color: var(--bs-info);
+}
+
+.awg-edition-sheets-stemma-tree {
+    margin: 0;
+    padding: 0.4rem 0.5rem;
+    list-style: none;
+}
+
+.awg-edition-sheets-stemma-node {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-left: calc(var(--depth, 0) * #{$indent});
+    padding: 0.1rem 0.4rem;
+    border-radius: 0.25rem;
+    font-size: 0.8125rem;
+    cursor: pointer;
+
+    // connector lines to the parent
+    &:not(.root) {
+        &::before {
+            content: '';
+            position: absolute;
+            top: -0.45rem;
+            left: -0.6rem;
+            width: 0.5rem;
+            height: 1.05rem;
+            border-bottom: 1px solid var(--bs-border-color);
+            border-left: 1px solid var(--bs-border-color);
+        }
+    }
+
+    &:hover,
+    &:focus-visible {
+        background-color: var(--bs-tertiary-bg);
+        outline: none;
+    }
+
+    &.in-lineage {
+        font-weight: 600;
+
+        &::before {
+            border-color: var(--bs-info);
+        }
+    }
+
+    &.active {
+        background-color: var(--bs-info);
+        color: #fff;
+    }
+}
+
+.awg-edition-sheets-stemma-dot {
+    display: inline-block;
+    flex-shrink: 0;
+    margin-left: auto;
+    border-radius: 50%;
+    background-color: var(--bs-info);
+    opacity: 0.7;
+
+    .active & {
+        background-color: #fff;
+    }
+}
