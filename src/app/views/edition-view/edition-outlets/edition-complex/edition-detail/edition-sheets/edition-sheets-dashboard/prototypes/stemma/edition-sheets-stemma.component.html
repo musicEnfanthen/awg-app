@@ -1,0 +1,99 @@
+<!-- Edition Sheets Stemma (prototype) -->
+@let activeId = activeSheet()?.id;
+@let lineageIds = activeLineageIds();
+
+<div class="awg-edition-sheets-stemma">
+    <!-- breadcrumb: lineage of the selected sheet -->
+    @if (activeLineage().length > 0) {
+        <nav class="awg-edition-sheets-stemma-lineage" aria-label="Genese des gewählten Notentexts">
+            <span class="text-muted small me-1">Genese:</span>
+            @for (sheet of activeLineage(); track sheet.id; let isLast = $last) {
+                @if (isLast) {
+                    <strong>{{ sheet.label }}</strong>
+                } @else {
+                    <a
+                        class="awg-edition-sheets-stemma-lineage-link"
+                        tabindex="0"
+                        role="link"
+                        (awgClick)="openSheet(sheet)"
+                        >{{ sheet.label }}</a
+                    >
+                    <span class="text-muted mx-1">›</span>
+                }
+            }
+        </nav>
+    }
+
+    <div class="awg-edition-sheets-stemma-board">
+        <!-- one stemma tree per manuscript -->
+        @for (group of stemmaGroups(); track group.manuscript) {
+            @let isCollapsed = collapsedManuscripts().has(group.manuscript);
+            <section class="card awg-edition-sheets-stemma-group">
+                <button
+                    type="button"
+                    class="card-header awg-edition-sheets-stemma-group-header"
+                    [attr.aria-expanded]="!isCollapsed"
+                    (click)="toggleManuscript(group.manuscript)">
+                    <fa-icon [icon]="isCollapsed ? faChevronRight : faChevronDown" />
+                    <span>{{ group.manuscript }}</span>
+                    <span class="badge text-bg-light ms-auto">{{ group.rows.length }}</span>
+                </button>
+
+                @if (!isCollapsed) {
+                    <ul class="awg-edition-sheets-stemma-tree" role="tree">
+                        @for (row of group.rows; track row.sheet.id) {
+                            <li
+                                class="awg-edition-sheets-stemma-node"
+                                role="treeitem"
+                                tabindex="0"
+                                [style.--depth]="row.depth"
+                                [class.root]="row.depth === 0"
+                                [class.last]="row.isLastChild"
+                                [class.active]="row.sheet.id === activeId"
+                                [class.in-lineage]="lineageIds.has(row.sheet.id)"
+                                [attr.aria-level]="row.depth + 1"
+                                [attr.aria-selected]="row.sheet.id === activeId"
+                                (awgClick)="openSheet(row.sheet)">
+                                <span class="awg-edition-sheets-stemma-node-label">{{ row.sheet.label }}</span>
+                                @if (row.sheet.hasRowtable) {
+                                    <fa-icon class="text-secondary" title="Reihentabelle" [icon]="faTableList" />
+                                }
+                                @if (row.sheet.commentCount > 0) {
+                                    @let dotSize = getCommentDotSize(row.sheet);
+                                    <span
+                                        class="awg-edition-sheets-stemma-dot"
+                                        [title]="row.sheet.commentCount + ' Kommentare'"
+                                        [style.width.px]="dotSize"
+                                        [style.height.px]="dotSize"></span>
+                                }
+                            </li>
+                        }
+                    </ul>
+                }
+            </section>
+        }
+
+        <!-- targets: text and work editions -->
+        @if (targetSheets().length > 0) {
+            <section class="card awg-edition-sheets-stemma-group awg-edition-sheets-stemma-targets">
+                <div class="card-header awg-edition-sheets-stemma-group-header">
+                    <fa-icon [icon]="faFlagCheckered" />
+                    <span>Fassungen</span>
+                </div>
+                <ul class="awg-edition-sheets-stemma-tree">
+                    @for (sheet of targetSheets(); track sheet.id) {
+                        <li
+                            class="awg-edition-sheets-stemma-node root"
+                            tabindex="0"
+                            role="link"
+                            [class.active]="sheet.id === activeId"
+                            (awgClick)="openSheet(sheet)">
+                            <span class="awg-edition-sheets-stemma-node-label">{{ sheet.label }}</span>
+                            <span class="text-muted small ms-auto">{{ sheet.editionTypeLabel }}</span>
+                        </li>
+                    }
+                </ul>
+            </section>
+        }
+    </div>
+</div>

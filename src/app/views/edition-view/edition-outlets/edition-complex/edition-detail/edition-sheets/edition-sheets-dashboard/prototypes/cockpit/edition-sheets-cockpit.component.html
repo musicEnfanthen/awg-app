@@ -1,0 +1,157 @@
+<!-- Edition Sheets Cockpit (prototype) -->
+@let sheet = activeSheet();
+@let selection = selectedSvgSheet();
+
+@if (sheet && selection) {
+    <div class="awg-edition-sheets-cockpit">
+        <!-- hero tile: preview, paging and jump to the music text -->
+        <section class="card awg-edition-sheets-cockpit-tile awg-edition-sheets-cockpit-hero">
+            <div class="awg-edition-sheets-cockpit-preview">
+                <img [src]="selection.content.svg" [alt]="'Vorschau ' + sheet.label" />
+            </div>
+            <div class="card-body">
+                <p class="text-muted small mb-1">{{ sheet.editionTypeLabel }}</p>
+                <h5 class="card-title">
+                    {{ sheet.label }}
+                    @if (selection.content.partial) {
+                        <span class="text-muted">[{{ selection.content.partial }}]</span>
+                    }
+                </h5>
+
+                <div class="awg-edition-sheets-cockpit-paging">
+                    <button
+                        type="button"
+                        class="btn btn-sm btn-outline-secondary"
+                        aria-label="Vorheriger Notentext"
+                        [disabled]="position() <= 0"
+                        (click)="browse(-1)">
+                        <fa-icon [icon]="faChevronLeft" />
+                    </button>
+                    <span class="small text-muted">{{ position() + 1 }} / {{ siblingFullIds().length }}</span>
+                    <button
+                        type="button"
+                        class="btn btn-sm btn-outline-secondary"
+                        aria-label="Nächster Notentext"
+                        [disabled]="position() >= siblingFullIds().length - 1"
+                        (click)="browse(1)">
+                        <fa-icon [icon]="faChevronRight" />
+                    </button>
+                </div>
+
+                <button type="button" class="btn btn-info w-100 mt-3" (click)="openSheetRequest.emit()">
+                    <fa-icon [icon]="faArrowDown" /> Zum edierten Notentext
+                </button>
+            </div>
+        </section>
+
+        <!-- key figures tile -->
+        <section class="card awg-edition-sheets-cockpit-tile">
+            <div class="card-header">Textkritik</div>
+            <div class="card-body awg-edition-sheets-cockpit-kpis">
+                <div class="awg-edition-sheets-cockpit-kpi">
+                    <fa-icon [icon]="faComment" />
+                    <span class="awg-edition-sheets-cockpit-kpi-value">{{ sheet.commentCount }}</span>
+                    <span class="awg-edition-sheets-cockpit-kpi-label">Kommentare</span>
+                </div>
+                <div class="awg-edition-sheets-cockpit-kpi">
+                    <fa-icon [icon]="faListCheck" />
+                    <span class="awg-edition-sheets-cockpit-kpi-value">{{ sheet.evaluationCount }}</span>
+                    <span class="awg-edition-sheets-cockpit-kpi-label">Bewertungen</span>
+                </div>
+                <div class="awg-edition-sheets-cockpit-kpi">
+                    <fa-icon [icon]="faLink" />
+                    <span class="awg-edition-sheets-cockpit-kpi-value">{{ sheet.linkTargets.length }}</span>
+                    <span class="awg-edition-sheets-cockpit-kpi-label">Verweise</span>
+                </div>
+                <div class="awg-edition-sheets-cockpit-kpi">
+                    <fa-icon [icon]="faTableList" />
+                    <span class="awg-edition-sheets-cockpit-kpi-value">{{ sheet.hasRowtable ? 'ja' : '–' }}</span>
+                    <span class="awg-edition-sheets-cockpit-kpi-label">Reihentabelle</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- location tile: folios -->
+        <section class="card awg-edition-sheets-cockpit-tile awg-edition-sheets-cockpit-location">
+            <div class="card-header">Fundort</div>
+            <div class="card-body">
+                @for (location of sheet.folioLocations; track location.convoluteId) {
+                    <p class="small mb-1">{{ location.convoluteLabel }}</p>
+                    <div class="awg-edition-sheets-cockpit-folios">
+                        @for (folio of location.folios; track folio.folioId) {
+                            <figure class="awg-edition-sheets-cockpit-folio">
+                                <awg-edition-folios-viewer-svg [folio]="folio" [selectedSvgSheet]="selection" />
+                                <figcaption class="small text-muted">Bl. {{ folio.folioId }}</figcaption>
+                            </figure>
+                        }
+                    </div>
+                } @empty {
+                    <p class="text-muted small fst-italic mb-0">Kein Fundort im Konvolut verzeichnet.</p>
+                }
+            </div>
+        </section>
+
+        <!-- relations tile: genesis and link boxes -->
+        @let relations = genesis();
+        <section class="card awg-edition-sheets-cockpit-tile">
+            <div class="card-header">Umfeld</div>
+            <div class="card-body awg-edition-sheets-cockpit-relations">
+                @if (relations.parent; as parent) {
+                    <div>
+                        <span class="awg-edition-sheets-cockpit-relations-label">hervorgegangen aus</span>
+                        <button
+                            type="button"
+                            class="btn btn-sm btn-outline-info"
+                            (click)="navigate(parent.sheetTarget)">
+                            {{ parent.label }}
+                        </button>
+                    </div>
+                }
+                @if (relations.siblings.length > 0) {
+                    <div>
+                        <span class="awg-edition-sheets-cockpit-relations-label">parallel</span>
+                        @for (relation of relations.siblings; track relation.key) {
+                            <button
+                                type="button"
+                                class="btn btn-sm btn-outline-secondary"
+                                (click)="navigate(relation.sheetTarget)">
+                                {{ relation.label }}
+                            </button>
+                        }
+                    </div>
+                }
+                @if (relations.children.length > 0) {
+                    <div>
+                        <span class="awg-edition-sheets-cockpit-relations-label">weitergeführt in</span>
+                        @for (relation of relations.children; track relation.key) {
+                            <button
+                                type="button"
+                                class="btn btn-sm btn-outline-info"
+                                (click)="navigate(relation.sheetTarget)">
+                                {{ relation.label }}
+                            </button>
+                        }
+                    </div>
+                }
+                @if (links().length > 0) {
+                    <div>
+                        <span class="awg-edition-sheets-cockpit-relations-label">verweist auf</span>
+                        @for (relation of links(); track relation.key) {
+                            <button
+                                type="button"
+                                class="btn btn-sm btn-outline-dark"
+                                (click)="navigate(relation.sheetTarget)">
+                                <fa-icon [icon]="faLink" /> {{ relation.label }}
+                            </button>
+                        }
+                    </div>
+                }
+                @if (!relations.parent && relations.children.length === 0 && links().length === 0) {
+                    <p class="text-muted small fst-italic mb-0">Keine verwandten Notentexte.</p>
+                }
+            </div>
+        </section>
+    </div>
+} @else {
+    <p class="text-muted fst-italic">Bitte wählen Sie einen Notentext aus.</p>
+}

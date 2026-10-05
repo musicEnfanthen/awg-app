@@ -19,6 +19,7 @@ import { EditionViewService } from '@awg-views/edition-view/services/edition-vie
 import { EDITION_SHEETS_UTILS } from '@awg-views/edition-view/utils/edition-sheets.utils';
 
 import { EditionFoliosPanelComponent } from './edition-folios-panel/edition-folios-panel.component';
+import { EditionSheetsDashboardComponent } from './edition-sheets-dashboard/edition-sheets-dashboard.component';
 import { EditionSheetsPanelComponent } from './edition-sheets-panel/edition-sheets-panel.component';
 
 /**
@@ -35,6 +36,7 @@ import { EditionSheetsPanelComponent } from './edition-sheets-panel/edition-shee
     imports: [
         AlertErrorComponent,
         EditionFoliosPanelComponent,
+        EditionSheetsDashboardComponent,
         EditionSheetsPanelComponent,
         TwelveToneSpinnerComponent,
     ],

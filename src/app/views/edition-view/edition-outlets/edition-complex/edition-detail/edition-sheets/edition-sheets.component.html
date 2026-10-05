@@ -7,7 +7,16 @@
             <awg-twelve-tone-spinner />
         } @else {
             <div class="awg-edition-sheets-view">
+                <!-- sheets dashboard (prototypes) -->
+                <awg-edition-sheets-dashboard
+                    [svgSheetsData]="view.data.svgSheetsData"
+                    [folioConvoluteData]="view.data.folioConvoluteData"
+                    [textcriticsData]="view.data.textcriticsData"
+                    [selectedSvgSheet]="selectedSvgSheet()"
+                    (openSheetRequest)="sheetsPanelAnchor.scrollIntoView({ behavior: 'smooth' })" />
+
                 <!-- sheets panel -->
+                <div #sheetsPanelAnchor></div>
                 <awg-edition-sheets-panel
                     [(isSheetFacetMinimized)]="isSheetFacetMinimized"
                     [svgSheetsData]="view.data.svgSheetsData"

@@ -1,0 +1,59 @@
+<div ngbAccordion>
+    <div ngbAccordionItem="awg-edition-sheets-dashboard" [collapsed]="false">
+        <div ngbAccordionHeader>
+            <button ngbAccordionButton>Übersicht <span class="badge text-bg-warning ms-2">Prototyp</span></button>
+        </div>
+        <div ngbAccordionCollapse>
+            <div ngbAccordionBody>
+                <ng-template>
+                    <!-- view mode switch (prototypes) -->
+                    <div class="awg-edition-sheets-dashboard-header">
+                        <p class="text-muted small mb-0">
+                            {{ sheets().length }} edierte Notentexte – wählen Sie einen Notentext aus.
+                        </p>
+                        <div class="btn-group" role="group" aria-label="Ansicht">
+                            @for (option of viewOptions; track option.mode) {
+                                <input
+                                    type="radio"
+                                    class="btn-check"
+                                    name="awg-edition-sheets-dashboard-view-mode"
+                                    autocomplete="off"
+                                    [id]="'awg-edition-sheets-dashboard-view-' + option.mode"
+                                    [checked]="viewMode() === option.mode"
+                                    (change)="viewMode.set(option.mode)" />
+                                <label
+                                    class="btn btn-sm btn-outline-info"
+                                    [for]="'awg-edition-sheets-dashboard-view-' + option.mode"
+                                    ><fa-icon [icon]="option.icon" />
+                                    <span class="ms-1">{{ option.label }}</span>
+                                </label>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- dashboard views -->
+                    @switch (viewMode()) {
+                        @case ('stemma') {
+                            <awg-edition-sheets-stemma
+                                [sheets]="sheets()"
+                                [selectedSvgSheet]="selectedSvgSheet()"
+                                (openSheetRequest)="openSheetRequest.emit()" />
+                        }
+                        @case ('cockpit') {
+                            <awg-edition-sheets-cockpit
+                                [sheets]="sheets()"
+                                [selectedSvgSheet]="selectedSvgSheet()"
+                                (openSheetRequest)="openSheetRequest.emit()" />
+                        }
+                        @default {
+                            <awg-edition-sheets-gallery
+                                [sheets]="sheets()"
+                                [selectedSvgSheet]="selectedSvgSheet()"
+                                (openSheetRequest)="openSheetRequest.emit()" />
+                        }
+                    }
+                </ng-template>
+            </div>
+        </div>
+    </div>
+</div>
