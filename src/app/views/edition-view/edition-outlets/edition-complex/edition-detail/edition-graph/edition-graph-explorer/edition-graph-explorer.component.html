@@ -1,0 +1,148 @@
+@if (hasData()) {
+    @let data = explorerData();
+    @let counts = stats();
+
+    <div class="awg-graph-explorer">
+        <h4>
+            Graph-Explorer
+            <span class="badge rounded-pill awg-graph-explorer-badge align-middle ms-1">experimentell</span>
+        </h4>
+        <p>
+            Drei alternative Lesarten derselben RDF-Daten wie im dynamischen Graphen unten: die
+            <em>Werkstruktur</em> als Hierarchie von Editionskomplexen, Skizzen und Paratexten, der
+            <em>Schreibprozess</em> als Abfolge der Skizzen und die <em>Beziehungsmatrix</em> als kompakte Übersicht
+            aller Relationen. Eine Auswahl gilt für alle drei Ansichten.
+        </p>
+
+        <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+            <div class="btn-group" role="group" aria-label="Ansicht des Graph-Explorers">
+                @for (view of views; track view.type) {
+                    <input
+                        type="radio"
+                        class="btn-check"
+                        [name]="groupName"
+                        [id]="groupName + '-' + view.type"
+                        [checked]="view.type === selectedView()"
+                        (change)="selectedView.set(view.type)"
+                        autocomplete="off" />
+                    <label class="btn btn-sm btn-outline-info" [for]="groupName + '-' + view.type">
+                        <fa-icon [icon]="view.icon" class="me-1" />{{ view.label }}
+                    </label>
+                }
+            </div>
+            <span class="ms-auto small text-muted awg-graph-explorer-stats">
+                <span class="awg-gx-dot awg-gx-complex"></span>{{ counts.complexes }} Komplexe
+                <span class="awg-gx-dot awg-gx-sketch ms-2"></span>{{ counts.sketches }} Skizzen
+                <span class="awg-gx-dot awg-gx-paratext ms-2"></span>{{ counts.paratexts }} Paratexte
+                <span class="ms-2">· {{ counts.relations }} Relationen</span>
+            </span>
+        </div>
+
+        <div class="awg-graph-explorer-stage border rounded-3">
+            @switch (selectedView()) {
+                @case ('tree') {
+                    <awg-edition-graph-explorer-tree
+                        [explorerData]="data"
+                        [selectedId]="selectedId()"
+                        (selectRequest)="selectNode($event)" />
+                }
+                @case ('flow') {
+                    <awg-edition-graph-explorer-flow
+                        [explorerData]="data"
+                        [selectedId]="selectedId()"
+                        (selectRequest)="selectNode($event)" />
+                }
+                @case ('matrix') {
+                    <awg-edition-graph-explorer-matrix
+                        [explorerData]="data"
+                        [selectedId]="selectedId()"
+                        (selectRequest)="selectNode($event)" />
+                }
+            }
+        </div>
+
+        <!-- Profile of the selected node -->
+        @if (selectedRelations(); as relations) {
+            <div class="awg-graph-explorer-profile border rounded-3 mt-2 p-2 px-3" aria-live="polite">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="awg-gx-dot" [class]="'awg-gx-' + relations.node.kind"></span>
+                    <strong>{{ relations.node.label }}</strong>
+                    <span class="badge text-bg-light">{{ kindLabels[relations.node.kind] }}</span>
+                    @if (relations.parent; as parent) {
+                        <span class="small text-muted">
+                            Teil von
+                            <button type="button" class="btn btn-link btn-sm p-0" (click)="selectNode(parent.id)">
+                                {{ parent.label }}
+                            </button>
+                        </span>
+                    }
+                    <button
+                        type="button"
+                        class="btn btn-sm btn-outline-secondary ms-auto"
+                        aria-label="Auswahl aufheben"
+                        (click)="selectNode(undefined)">
+                        <fa-icon [icon]="faXmark" />
+                    </button>
+                </div>
+                <dl class="awg-graph-explorer-profile-list small mb-0 mt-1">
+                    @if (relations.predecessors.length) {
+                        <dt>Vorausgehend</dt>
+                        <dd>
+                            @for (rel of relations.predecessors; track rel.node.id) {
+                                <button
+                                    type="button"
+                                    class="awg-gx-chip"
+                                    [class]="'awg-gx-edge-' + rel.kind"
+                                    [title]="rel.node.label + ' ' + edgeLabels[rel.kind]"
+                                    (click)="selectNode(rel.node.id)">
+                                    {{ rel.node.label }}
+                                </button>
+                            }
+                        </dd>
+                    }
+                    @if (relations.successors.length) {
+                        <dt>Nachfolgend</dt>
+                        <dd>
+                            @for (rel of relations.successors; track rel.node.id) {
+                                <button
+                                    type="button"
+                                    class="awg-gx-chip"
+                                    [class]="'awg-gx-edge-' + rel.kind"
+                                    [title]="relations.node.label + ' ' + edgeLabels[rel.kind]"
+                                    (click)="selectNode(rel.node.id)">
+                                    {{ rel.node.label }}
+                                </button>
+                            }
+                        </dd>
+                    }
+                    @if (relations.accompanies.length) {
+                        <dt>Begleitet</dt>
+                        <dd>
+                            @for (node of relations.accompanies; track node.id) {
+                                <button
+                                    type="button"
+                                    class="awg-gx-chip awg-gx-edge-concomitates"
+                                    (click)="selectNode(node.id)">
+                                    {{ node.label }}
+                                </button>
+                            }
+                        </dd>
+                    }
+                    @if (relations.accompaniedBy.length) {
+                        <dt>Begleitet von</dt>
+                        <dd>
+                            @for (node of relations.accompaniedBy; track node.id) {
+                                <button
+                                    type="button"
+                                    class="awg-gx-chip awg-gx-edge-concomitates"
+                                    (click)="selectNode(node.id)">
+                                    {{ node.label }}
+                                </button>
+                            }
+                        </dd>
+                    }
+                </dl>
+            </div>
+        }
+    </div>
+}

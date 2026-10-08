@@ -23,6 +23,7 @@
                 @for (graph of view.data.graphData?.graph || []; track graph.id) {
                     <div>
                         <awg-edition-graph-description [graph]="graph" [editionComplex]="selectedEditionComplex()" />
+                        <awg-edition-graph-explorer [rdfData]="graph.rdfData" />
                         <awg-edition-graph-dynamic [rdfData]="graph.rdfData" />
                         <awg-edition-graph-static [imageKey]="graph.staticImage" />
                     </div>

@@ -1,0 +1,155 @@
+:host {
+    display: block;
+}
+
+.awg-gx-flow-svg {
+    display: block;
+    width: 100%;
+    cursor: grab;
+    user-select: none;
+
+    &:active {
+        cursor: grabbing;
+    }
+}
+
+.awg-gx-flow-swatch {
+    display: inline-block;
+    width: 0.8em;
+    height: 0.8em;
+    margin: 0 0.25em 0 0.4em;
+    border-radius: 0.2em;
+    vertical-align: -0.05em;
+
+    &.is-predecessor {
+        background-color: color-mix(in srgb, var(--awg-gx-precedes-scripture) 25%, #fff);
+        border: 1px solid var(--awg-gx-precedes-scripture);
+    }
+    &.is-successor {
+        background-color: color-mix(in srgb, var(--awg-gx-precedes-content) 25%, #fff);
+        border: 1px solid var(--awg-gx-precedes-content);
+    }
+}
+
+// Lanes
+.awg-gx-flow-lane {
+    rect {
+        fill: #fff;
+    }
+
+    &.is-odd rect {
+        fill: color-mix(in srgb, var(--awg-gx-complex) 5%, #fff);
+    }
+
+    text {
+        fill: var(--awg-gx-complex);
+        font-size: 13px;
+        font-weight: 600;
+    }
+}
+
+// Links
+.awg-gx-flow-link {
+    fill: none;
+    stroke: var(--awg-gx-precedes);
+    stroke-width: 1.4;
+    transition:
+        opacity 0.2s,
+        stroke-width 0.2s;
+
+    &.awg-gx-flow-link-precedesScripture {
+        stroke: var(--awg-gx-precedes-scripture);
+        stroke-dasharray: 6 4;
+    }
+    &.awg-gx-flow-link-precedesContent {
+        stroke: var(--awg-gx-precedes-content);
+        stroke-dasharray: 2 3;
+    }
+    &.awg-gx-flow-link-concomitates {
+        stroke: var(--awg-gx-concomitates);
+        stroke-width: 1;
+    }
+
+    &.is-dimmed {
+        opacity: 0.12;
+    }
+    &.is-focus,
+    &.is-predecessor,
+    &.is-successor {
+        stroke: var(--awg-gx-highlight);
+        stroke-width: 2.6;
+    }
+}
+
+.awg-gx-flow-marker {
+    fill: var(--awg-gx-precedes);
+
+    &.awg-gx-flow-marker-precedesScripture {
+        fill: var(--awg-gx-precedes-scripture);
+    }
+    &.awg-gx-flow-marker-precedesContent {
+        fill: var(--awg-gx-precedes-content);
+    }
+    &.awg-gx-flow-marker-highlight {
+        fill: #d39b00;
+    }
+}
+
+// Nodes
+.awg-gx-flow-node {
+    cursor: pointer;
+    transition: opacity 0.2s;
+
+    rect {
+        fill: #fff;
+        stroke: var(--awg-gx-sketch);
+        stroke-width: 1.5;
+    }
+
+    text {
+        fill: #212529;
+        font-size: 11px;
+        pointer-events: none;
+    }
+
+    &.awg-gx-flow-node-paratext rect {
+        stroke: var(--awg-gx-paratext);
+        stroke-dasharray: 4 2;
+    }
+
+    &.is-concomitant {
+        rect {
+            fill: color-mix(in srgb, var(--awg-gx-sketch) 7%, #fff);
+            stroke-width: 1;
+        }
+        text {
+            font-size: 10px;
+        }
+    }
+
+    &:hover rect {
+        stroke-width: 2.5;
+    }
+
+    &.is-dimmed {
+        opacity: 0.25;
+    }
+    &.is-predecessor rect {
+        fill: color-mix(in srgb, var(--awg-gx-precedes-scripture) 18%, #fff);
+        stroke: var(--awg-gx-precedes-scripture);
+    }
+    &.is-successor rect {
+        fill: color-mix(in srgb, var(--awg-gx-precedes-content) 18%, #fff);
+        stroke: var(--awg-gx-precedes-content);
+    }
+    &.is-related rect {
+        stroke: var(--awg-gx-concomitates);
+        stroke-width: 2;
+    }
+    &.is-focus rect,
+    &.is-selected rect {
+        fill: var(--awg-gx-highlight);
+        stroke: #8a6500;
+        stroke-width: 2.5;
+    }
+}

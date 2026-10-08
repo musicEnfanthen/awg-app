@@ -1,0 +1,105 @@
+@let flow = layout();
+@let summary = focusSummary();
+
+<div class="awg-gx-flow-toolbar d-flex flex-wrap align-items-center gap-2 p-2 border-bottom small">
+    @if (summary) {
+        <span>
+            <strong>{{ summary.label }}</strong
+            >: <span class="awg-gx-flow-swatch is-predecessor"></span>{{ summary.predecessors }} vorausgehend ·
+            <span class="awg-gx-flow-swatch is-successor"></span>{{ summary.successors }} nachfolgend (transitiv)
+        </span>
+    } @else {
+        <span class="text-muted">
+            Skizze überfahren oder anklicken: alle (transitiv) vorausgehenden und nachfolgenden Objekte werden
+            hervorgehoben. Ziehen und Mausrad zum Verschieben und Zoomen.
+        </span>
+    }
+    <button type="button" class="btn btn-sm btn-outline-secondary ms-auto" (click)="resetZoom()">
+        Ansicht zurücksetzen ({{ zoomPercent() }} %)
+    </button>
+</div>
+
+<svg
+    class="awg-gx-flow-svg"
+    role="group"
+    aria-label="Schreibprozess: Abfolge der Skizzen je Teilkomplex"
+    [attr.height]="svgHeight()"
+    awgSvgZoom
+    [zoomConfig]="zoomConfig"
+    [zoomTarget]="zoomGroup"
+    [(zoomValue)]="zoomValue"
+    (mouseleave)="hoveredId.set(undefined)">
+    <defs>
+        @for (kind of markerKinds; track kind) {
+            <marker
+                [attr.id]="markerPrefix + '-' + kind"
+                viewBox="0 -5 10 10"
+                refX="9"
+                refY="0"
+                markerWidth="7"
+                markerHeight="7"
+                orient="auto">
+                <path d="M0,-4L9,0L0,4" [attr.class]="'awg-gx-flow-marker awg-gx-flow-marker-' + kind" />
+            </marker>
+        }
+    </defs>
+
+    <g #zoomGroup>
+        <!-- Lanes -->
+        @for (lane of flow.lanes; track lane.y; let odd = $odd) {
+            <g class="awg-gx-flow-lane" [class.is-odd]="odd">
+                <rect x="0" [attr.y]="lane.y" [attr.width]="flow.width" [attr.height]="lane.height" />
+                <text x="12" [attr.y]="lane.y + 22">{{ lane.label }}</text>
+            </g>
+        }
+
+        <!-- Links -->
+        <g class="awg-gx-flow-links">
+            @for (link of flow.links; track $index) {
+                @let state = linkState(link);
+                <path
+                    [attr.d]="link.path"
+                    [attr.class]="'awg-gx-flow-link awg-gx-flow-link-' + link.edge.kind + ' is-' + state"
+                    [attr.marker-end]="
+                        link.edge.kind === 'concomitates'
+                            ? null
+                            : 'url(#' +
+                              markerPrefix +
+                              '-' +
+                              (state === 'none' || state === 'dimmed' ? link.edge.kind : 'highlight') +
+                              ')'
+                    " />
+            }
+        </g>
+
+        <!-- Nodes -->
+        <g class="awg-gx-flow-nodes">
+            @for (viewNode of viewNodes(); track viewNode.node.id) {
+                @let node = viewNode.node;
+                <g
+                    class="awg-gx-flow-node"
+                    [class]="'awg-gx-flow-node-' + node.kind + ' is-' + nodeState(node.id)"
+                    [class.is-concomitant]="viewNode.isConcomitant"
+                    [class.is-selected]="node.id === selectedId()"
+                    [attr.transform]="viewNode.transform"
+                    (mouseenter)="hoveredId.set(node.id)"
+                    (click)="selectRequest.emit(node.id)">
+                    <title>{{ node.label }} ({{ kindLabels[node.kind] }})</title>
+                    <rect [attr.width]="viewNode.width" [attr.height]="sizes.nodeHeight" rx="11" />
+                    <text x="9" [attr.y]="sizes.nodeHeight / 2 + 4">{{ viewNode.shortLabel }}</text>
+                </g>
+            }
+        </g>
+    </g>
+</svg>
+
+<div class="awg-gx-flow-legend d-flex flex-wrap gap-3 p-2 border-top small text-muted">
+    @for (kind of legend; track kind) {
+        <span>
+            <svg width="34" height="10" aria-hidden="true">
+                <path d="M1,5 H32" [attr.class]="'awg-gx-flow-link awg-gx-flow-link-' + kind" />
+            </svg>
+            {{ edgeLabels[kind] }}
+        </span>
+    }
+</div>

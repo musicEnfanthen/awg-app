@@ -1,0 +1,83 @@
+@let expandedIds = expanded();
+@let visibleIds = visible();
+@let matchIds = matches();
+
+<div class="awg-gx-tree-toolbar d-flex flex-wrap gap-2 p-2 border-bottom">
+    <input
+        type="search"
+        class="form-control form-control-sm awg-gx-tree-filter"
+        placeholder="Skizzen, Paratexte, Komplexe filtern …"
+        aria-label="Werkstruktur filtern"
+        [value]="filter()"
+        (input)="onFilterInput($event)" />
+    <button type="button" class="btn btn-sm btn-outline-secondary" (click)="expandAll(true)">Alle aufklappen</button>
+    <button type="button" class="btn btn-sm btn-outline-secondary" (click)="expandAll(false)">Alle zuklappen</button>
+    @if (matchIds) {
+        <span class="small text-muted align-self-center">{{ matchIds.size }} Treffer</span>
+    }
+</div>
+
+<div class="awg-gx-tree-scroll p-2">
+    <ul class="awg-gx-tree" role="tree" aria-label="Werkstruktur">
+        <ng-container *ngTemplateOutlet="branch; context: { $implicit: tree() }" />
+    </ul>
+</div>
+
+<ng-template #branch let-treeNodes>
+    @for (treeNode of treeNodes; track treeNode.node.id) {
+        @let node = treeNode.node;
+        @if (!visibleIds || visibleIds.has(node.id)) {
+            @let hasChildren = treeNode.children.length > 0;
+            @let isExpanded = hasChildren && expandedIds.has(node.id);
+            @let successors = successorCounts().get(node.id) ?? 0;
+            @let parts = labelParts(node.label);
+
+            <li
+                role="treeitem"
+                [attr.aria-selected]="node.id === selectedId()"
+                [attr.aria-expanded]="hasChildren ? isExpanded : null">
+                <div
+                    class="awg-gx-tree-row"
+                    [class.is-selected]="node.id === selectedId()"
+                    [class.is-dimmed]="matchIds && !matchIds.has(node.id)">
+                    @if (hasChildren) {
+                        <button
+                            type="button"
+                            class="awg-gx-tree-toggle"
+                            [class.is-expanded]="isExpanded"
+                            [attr.aria-label]="(isExpanded ? 'Zuklappen: ' : 'Aufklappen: ') + node.label"
+                            (click)="toggle(node.id)">
+                            <fa-icon [icon]="faChevronRight" />
+                        </button>
+                    } @else {
+                        <span class="awg-gx-tree-toggle-spacer"></span>
+                    }
+                    <button
+                        type="button"
+                        class="awg-gx-tree-label"
+                        [title]="kindLabel(node.kind)"
+                        (click)="selectRequest.emit(node.id)">
+                        <span class="awg-gx-tree-dot" [class]="'awg-gx-tree-dot-' + node.kind"></span>
+                        {{ parts.before }}<mark>{{ parts.match }}</mark
+                        >{{ parts.after }}
+                    </button>
+                    @if (hasChildren) {
+                        <span class="awg-gx-tree-count" title="Anzahl enthaltener Objekte">{{
+                            treeNode.descendantCount
+                        }}</span>
+                    }
+                    @if (successors) {
+                        <span class="awg-gx-tree-successors" title="Direkt nachfolgende Objekte"
+                            >→ {{ successors }}</span
+                        >
+                    }
+                </div>
+                @if (isExpanded) {
+                    <ul role="group">
+                        <ng-container *ngTemplateOutlet="branch; context: { $implicit: treeNode.children }" />
+                    </ul>
+                }
+            </li>
+        }
+    }
+</ng-template>

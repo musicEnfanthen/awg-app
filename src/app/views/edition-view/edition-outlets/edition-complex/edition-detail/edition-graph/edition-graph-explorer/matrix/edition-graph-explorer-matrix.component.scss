@@ -1,0 +1,90 @@
+:host {
+    display: block;
+}
+
+.awg-gx-matrix-toolbar {
+    min-height: 2.4rem;
+}
+
+.awg-gx-matrix-scroll {
+    max-height: 40rem;
+    overflow: auto;
+}
+
+.awg-gx-matrix-svg {
+    display: block;
+    font-size: 9px;
+}
+
+.awg-gx-matrix-bg {
+    fill: #fff;
+    stroke: #dee2e6;
+}
+
+.awg-gx-matrix-block {
+    fill: color-mix(in srgb, var(--awg-gx-complex) 4%, #fff);
+
+    &.is-odd {
+        fill: color-mix(in srgb, var(--awg-gx-sketch) 5%, #fff);
+    }
+}
+
+.awg-gx-matrix-separator {
+    stroke: color-mix(in srgb, var(--awg-gx-complex) 45%, #fff);
+    stroke-width: 1;
+}
+
+.awg-gx-matrix-group-label {
+    fill: var(--awg-gx-complex);
+    font-size: 11px;
+    font-weight: 600;
+    text-anchor: middle;
+}
+
+.awg-gx-matrix-band {
+    fill: color-mix(in srgb, var(--awg-gx-highlight) 30%, transparent);
+    pointer-events: none;
+
+    &.is-selected {
+        fill: color-mix(in srgb, var(--awg-gx-highlight) 18%, transparent);
+    }
+}
+
+.awg-gx-matrix-cell {
+    pointer-events: none;
+    fill: var(--awg-gx-precedes);
+
+    &.awg-gx-matrix-cell-precedesScripture {
+        fill: var(--awg-gx-precedes-scripture);
+    }
+    &.awg-gx-matrix-cell-precedesContent {
+        fill: var(--awg-gx-precedes-content);
+    }
+    &.awg-gx-matrix-cell-concomitates {
+        fill: var(--awg-gx-concomitates);
+    }
+    &.awg-gx-matrix-cell-transitive {
+        fill: color-mix(in srgb, var(--awg-gx-precedes) 18%, #fff);
+    }
+}
+
+.awg-gx-matrix-row-label,
+.awg-gx-matrix-col-label {
+    fill: #495057;
+    cursor: pointer;
+
+    &:hover,
+    &.is-active {
+        fill: #000;
+        font-weight: 700;
+    }
+}
+
+.awg-gx-matrix-row-label {
+    text-anchor: end;
+}
+
+.awg-gx-matrix-overlay {
+    fill: transparent;
+    cursor: crosshair;
+}
