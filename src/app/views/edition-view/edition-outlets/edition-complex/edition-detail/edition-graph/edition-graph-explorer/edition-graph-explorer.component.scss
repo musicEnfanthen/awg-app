@@ -1,0 +1,96 @@
+// Shared colors of the graph explorer (inherited by the views via custom properties)
+:host {
+    --awg-gx-complex: #6c4f9c;
+    --awg-gx-sketch: #2b7bb9;
+    --awg-gx-paratext: #c86f1b;
+    --awg-gx-other: #6c757d;
+    --awg-gx-precedes: #3d4a57;
+    --awg-gx-precedes-scripture: #b03a2e;
+    --awg-gx-precedes-content: #1e8449;
+    --awg-gx-concomitates: #9aa5b1;
+    --awg-gx-highlight: #f3b61f;
+    --awg-gx-surface: #fbfcfd;
+
+    display: block;
+    margin-bottom: 3rem;
+}
+
+.awg-graph-explorer-badge {
+    background-color: var(--awg-gx-highlight);
+    color: #3b2f00;
+    font-size: 0.6em;
+    font-weight: 500;
+}
+
+.awg-graph-explorer-stage {
+    background-color: var(--awg-gx-surface);
+    overflow: hidden;
+}
+
+.awg-gx-dot {
+    display: inline-block;
+    width: 0.65em;
+    height: 0.65em;
+    margin-right: 0.3em;
+    border-radius: 50%;
+    background-color: var(--awg-gx-other);
+
+    &.awg-gx-complex {
+        background-color: var(--awg-gx-complex);
+    }
+    &.awg-gx-sketch {
+        background-color: var(--awg-gx-sketch);
+    }
+    &.awg-gx-paratext {
+        background-color: var(--awg-gx-paratext);
+    }
+}
+
+.awg-graph-explorer-profile {
+    background-color: var(--awg-gx-surface);
+    border-left: 4px solid var(--awg-gx-highlight) !important;
+}
+
+.awg-graph-explorer-profile-list {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    column-gap: 0.75rem;
+    row-gap: 0.25rem;
+
+    dt {
+        font-weight: 500;
+        color: var(--bs-secondary-color);
+    }
+
+    dd {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.25rem;
+        margin: 0;
+    }
+}
+
+.awg-gx-chip {
+    padding: 0 0.5em;
+    border: 1px solid var(--awg-gx-precedes);
+    border-radius: 1em;
+    background: #fff;
+    color: inherit;
+    font-size: 0.85em;
+    line-height: 1.6;
+
+    &:hover,
+    &:focus-visible {
+        background-color: var(--awg-gx-highlight);
+    }
+
+    &.awg-gx-edge-precedesScripture {
+        border: 1px dashed var(--awg-gx-precedes-scripture);
+    }
+    &.awg-gx-edge-precedesContent {
+        border: 1px dotted var(--awg-gx-precedes-content);
+    }
+    &.awg-gx-edge-concomitates {
+        border-color: var(--awg-gx-concomitates);
+    }
+}

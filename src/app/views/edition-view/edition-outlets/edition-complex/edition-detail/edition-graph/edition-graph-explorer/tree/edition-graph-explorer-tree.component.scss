@@ -1,0 +1,124 @@
+:host {
+    display: block;
+}
+
+.awg-gx-tree-filter {
+    max-width: 22rem;
+}
+
+.awg-gx-tree-scroll {
+    max-height: 32rem;
+    overflow: auto;
+}
+
+.awg-gx-tree,
+.awg-gx-tree ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.awg-gx-tree ul {
+    margin-left: 0.7rem;
+    padding-left: 0.6rem;
+    border-left: 1px dashed var(--awg-gx-concomitates);
+}
+
+.awg-gx-tree-row {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.05rem 0.25rem;
+    border-radius: 0.35rem;
+    transition: background-color 0.15s;
+
+    &:hover {
+        background-color: rgb(0 0 0 / 4%);
+    }
+
+    &.is-selected {
+        background-color: color-mix(in srgb, var(--awg-gx-highlight) 35%, transparent);
+        font-weight: 600;
+    }
+
+    &.is-dimmed {
+        opacity: 0.55;
+    }
+}
+
+.awg-gx-tree-toggle,
+.awg-gx-tree-toggle-spacer {
+    flex: 0 0 1.1rem;
+    width: 1.1rem;
+}
+
+.awg-gx-tree-toggle {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--bs-secondary-color);
+    font-size: 0.7rem;
+    transition: transform 0.15s;
+
+    &.is-expanded {
+        transform: rotate(90deg);
+    }
+}
+
+.awg-gx-tree-label {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    text-align: left;
+
+    &:hover,
+    &:focus-visible {
+        text-decoration: underline;
+    }
+
+    mark {
+        padding: 0;
+        background-color: var(--awg-gx-highlight);
+    }
+}
+
+.awg-gx-tree-dot {
+    display: inline-block;
+    width: 0.6em;
+    height: 0.6em;
+    margin-right: 0.25em;
+    border-radius: 50%;
+    background-color: var(--awg-gx-other);
+
+    &.awg-gx-tree-dot-complex {
+        border-radius: 0.1em;
+        background-color: var(--awg-gx-complex);
+    }
+    &.awg-gx-tree-dot-sketch {
+        background-color: var(--awg-gx-sketch);
+    }
+    &.awg-gx-tree-dot-paratext {
+        transform: rotate(45deg);
+        border-radius: 0.1em;
+        background-color: var(--awg-gx-paratext);
+    }
+}
+
+.awg-gx-tree-count,
+.awg-gx-tree-successors {
+    padding: 0 0.45em;
+    border-radius: 1em;
+    font-size: 0.75em;
+    line-height: 1.5;
+}
+
+.awg-gx-tree-count {
+    background-color: rgb(0 0 0 / 7%);
+    color: var(--bs-secondary-color);
+}
+
+.awg-gx-tree-successors {
+    border: 1px solid var(--awg-gx-precedes);
+    color: var(--awg-gx-precedes);
+}
