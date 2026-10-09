@@ -1,0 +1,60 @@
+<div class="awg-graph-generated-gaps">
+    <h5>Lücken in den Editionsdaten</h5>
+    <p class="small text-muted">
+        Folgende Befunde schwächen den generierten Graphen. Sie werden aus den aktuell geladenen Daten berechnet; die
+        zweite Liste nennt Informationen, die strukturell noch gar nicht in den Daten vorgesehen sind.
+    </p>
+
+    <div ngbAccordion class="mb-3">
+        @for (item of report(); track item.id) {
+            <div ngbAccordionItem>
+                <h6 ngbAccordionHeader>
+                    <button ngbAccordionButton class="py-2">
+                        <span class="awg-gap-label">{{ item.label }}</span>
+                        <span class="badge text-bg-warning ms-auto me-2">{{ item.count }} / {{ item.total }}</span>
+                        <span class="awg-gap-bar me-2" aria-hidden="true">
+                            <span class="awg-gap-bar-fill" [style.width.%]="ratio(item)"></span>
+                        </span>
+                    </button>
+                </h6>
+                <div ngbAccordionCollapse>
+                    <div ngbAccordionBody class="small">
+                        <ng-template>
+                            <p class="mb-1">{{ item.description }}</p>
+                            <ul class="mb-0">
+                                @for (example of item.examples; track $index) {
+                                    <li>{{ example }}</li>
+                                }
+                                @if (item.count > item.examples.length) {
+                                    <li class="text-muted">… und {{ item.count - item.examples.length }} weitere</li>
+                                }
+                            </ul>
+                        </ng-template>
+                    </div>
+                </div>
+            </div>
+        } @empty {
+            <p class="small">Keine zählbaren Lücken gefunden.</p>
+        }
+    </div>
+
+    <h6>Strukturell fehlende Informationen</h6>
+    <table class="table table-sm small align-top awg-gap-table">
+        <thead>
+            <tr>
+                <th scope="col">Bereich</th>
+                <th scope="col">Befund</th>
+                <th scope="col">Vorschlag</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (gap of structuralGaps; track gap.label) {
+                <tr>
+                    <th scope="row">{{ gap.label }}</th>
+                    <td>{{ gap.description }}</td>
+                    <td>{{ gap.suggestion }}</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
