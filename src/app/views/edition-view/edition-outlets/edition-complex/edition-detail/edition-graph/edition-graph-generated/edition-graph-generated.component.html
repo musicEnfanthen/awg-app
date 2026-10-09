@@ -1,0 +1,113 @@
+<div class="awg-graph-generated">
+    <h4>
+        Generierter Graph
+        <span class="badge rounded-pill awg-graph-generated-badge align-middle ms-1">experimentell</span>
+        <awg-fullscreen-toggle [fsElement]="fullscreenWrapper" />
+    </h4>
+    <p>
+        Dieser Graph wird automatisch aus den Editionsdaten erzeugt: Werkkomplexe, Quellen und ihre Archive,
+        Beschreibstoffe, Blätter, Skizzen- und Texteditionen, textkritische Anmerkungen und Querverweise. Die
+        AWG-Ontologie wird dabei an etablierte Vokabulare angebunden (<em>FRBR</em>, <em>Music Ontology</em>,
+        <em>Dublin Core</em>, <em>schema.org</em>, <em>PROV-O</em>, <em>SKOS</em>, <em>FOAF</em>,
+        <em>Web Annotation</em>). Die IRIs sind mit den kuratierten Triples kompatibel, so dass beide zu einem Graphen
+        zusammengeführt werden können.
+    </p>
+
+    <div #fullscreenWrapper class="awg-fullscreen-wrapper">
+        <!-- toolbar -->
+        <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+            <div class="btn-group" role="group" aria-label="Umfang des generierten Graphen">
+                @for (option of scopeOptions; track option.scope) {
+                    <input
+                        type="radio"
+                        class="btn-check"
+                        name="awg-graph-generated-scope"
+                        [id]="'awg-graph-generated-scope-' + option.scope"
+                        [checked]="option.scope === scope()"
+                        (change)="scope.set(option.scope)"
+                        autocomplete="off" />
+                    <label class="btn btn-sm btn-outline-info" [for]="'awg-graph-generated-scope-' + option.scope">
+                        <fa-icon [icon]="option.icon" class="me-1" />{{ option.label }}
+                    </label>
+                }
+            </div>
+
+            <div ngbDropdown autoClose="outside" [popperOptions]="dropdownPopperOptions">
+                <button type="button" class="btn btn-sm btn-outline-info" ngbDropdownToggle>
+                    <fa-icon [icon]="faFilter" class="me-1" />Facetten ({{ facets().size }}/{{ facetOptions.length }})
+                </button>
+                <div ngbDropdownMenu class="awg-graph-generated-facets">
+                    @for (facet of facetOptions; track facet.key) {
+                        <label class="dropdown-item d-flex gap-2 align-items-start">
+                            <input
+                                type="checkbox"
+                                class="form-check-input mt-1"
+                                [checked]="isFacetSelected(facet.key)"
+                                (change)="toggleFacet(facet.key)" />
+                            <span>
+                                {{ facet.label }}
+                                <small class="d-block text-muted">{{ facet.description }}</small>
+                            </span>
+                        </label>
+                    }
+                </div>
+            </div>
+
+            @if (hasCuratedTriples()) {
+                <div class="form-check form-switch mb-0">
+                    <input
+                        class="form-check-input"
+                        type="checkbox"
+                        role="switch"
+                        id="awg-graph-generated-curated"
+                        [checked]="includeCurated()"
+                        (change)="includeCurated.set(!includeCurated())" />
+                    <label class="form-check-label small" for="awg-graph-generated-curated"
+                        >kuratierte Triples einbeziehen</label
+                    >
+                </div>
+            }
+
+            <button
+                type="button"
+                class="btn btn-sm btn-outline-secondary ms-auto"
+                [disabled]="!generated.value()"
+                (click)="downloadTurtle()">
+                <fa-icon [icon]="faDownload" class="me-1" />Turtle
+            </button>
+        </div>
+
+        <!-- stats -->
+        @if (generated.value(); as result) {
+            <p class="small text-muted mb-2 awg-graph-generated-stats">
+                {{ result.stats.triples }} Triples · {{ result.stats.complexes }} Werkkomplexe ·
+                {{ result.stats.sources }} Quellen · {{ result.stats.sheets }} Editionen ·
+                {{ result.stats.annotations }} Anmerkungen · {{ result.stats.references }} Querverweise
+                @if (generated.isLoading()) {
+                    <span class="ms-2">(wird aktualisiert …)</span>
+                }
+            </p>
+        }
+
+        <!-- graph -->
+        @if (editionProgress(); as progress) {
+            <div class="text-center py-4">
+                <awg-twelve-tone-spinner />
+                <p class="small text-muted">
+                    Lade Editionsdaten: {{ progress.loaded }} / {{ progress.total }} Werkkomplexe
+                </p>
+            </div>
+        } @else if (generated.error()) {
+            <div class="alert alert-danger small">Die RDF-Daten konnten nicht erzeugt werden.</div>
+        } @else if (generated.value(); as result) {
+            <awg-graph-visualizer [rdfData]="result.rdfData" [isFullscreenMode]="isFullscreen()" />
+        } @else {
+            <awg-twelve-tone-spinner />
+        }
+    </div>
+
+    <!-- gaps -->
+    @if (bundles()) {
+        <awg-edition-graph-generated-gaps class="d-block mt-4" [report]="gapReport()" />
+    }
+</div>

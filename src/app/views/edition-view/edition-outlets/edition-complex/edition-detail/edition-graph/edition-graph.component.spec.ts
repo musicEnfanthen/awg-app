@@ -29,6 +29,7 @@ import { EditionViewService } from '@awg-views/edition-view/services/edition-vie
 
 import { EditionGraphDescriptionComponent } from './edition-graph-description/edition-graph-description.component';
 import { EditionGraphDynamicComponent } from './edition-graph-dynamic/edition-graph-dynamic.component';
+import { EditionGraphGeneratedComponent } from './edition-graph-generated/edition-graph-generated.component';
 import { EditionGraphStaticComponent } from './edition-graph-static/edition-graph-static.component';
 import { EditionGraphComponent } from './edition-graph.component';
 
@@ -57,6 +58,7 @@ describe('EditionGraphComponent (DONE)', () => {
             .overrideComponent(AlertErrorComponent, { set: { template: '', imports: [] } })
             .overrideComponent(EditionGraphDescriptionComponent, { set: { template: '', imports: [] } })
             .overrideComponent(EditionGraphDynamicComponent, { set: { template: '', imports: [] } })
+            .overrideComponent(EditionGraphGeneratedComponent, { set: { template: '', imports: [] } })
             .overrideComponent(EditionGraphStaticComponent, { set: { template: '', imports: [] } })
             .overrideComponent(TwelveToneSpinnerComponent, { set: { template: '', imports: [] } })
             .compileComponents();

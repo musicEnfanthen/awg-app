@@ -20,6 +20,7 @@
                         kontinuierlich ergänzt.</span
                     >
                 </p>
+                <awg-edition-graph-generated />
                 @for (graph of view.data.graphData?.graph || []; track graph.id) {
                     <div>
                         <awg-edition-graph-description [graph]="graph" [editionComplex]="selectedEditionComplex()" />

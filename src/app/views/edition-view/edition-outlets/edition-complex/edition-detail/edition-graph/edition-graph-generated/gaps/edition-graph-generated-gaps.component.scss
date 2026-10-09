@@ -1,0 +1,22 @@
+.awg-gap-label {
+    font-size: 0.9rem;
+}
+
+.awg-gap-bar {
+    display: inline-block;
+    flex: 0 0 5rem;
+    height: 0.4rem;
+    border-radius: 0.2rem;
+    background-color: var(--bs-secondary-bg);
+    overflow: hidden;
+}
+
+.awg-gap-bar-fill {
+    display: block;
+    height: 100%;
+    background-color: var(--bs-warning);
+}
+
+.awg-gap-table th[scope='row'] {
+    white-space: nowrap;
+}

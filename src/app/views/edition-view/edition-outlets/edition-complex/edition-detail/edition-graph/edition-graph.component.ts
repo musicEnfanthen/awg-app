@@ -9,6 +9,7 @@ import { EditionViewService } from '@awg-views/edition-view/services/edition-vie
 import { EditionGraphDescriptionComponent } from './edition-graph-description/edition-graph-description.component';
 import { EditionGraphDynamicComponent } from './edition-graph-dynamic/edition-graph-dynamic.component';
 import { EditionGraphExplorerComponent } from './edition-graph-explorer/edition-graph-explorer.component';
+import { EditionGraphGeneratedComponent } from './edition-graph-generated/edition-graph-generated.component';
 import { EditionGraphStaticComponent } from './edition-graph-static/edition-graph-static.component';
 
 /**
@@ -27,6 +28,7 @@ import { EditionGraphStaticComponent } from './edition-graph-static/edition-grap
         EditionGraphDescriptionComponent,
         EditionGraphDynamicComponent,
         EditionGraphExplorerComponent,
+        EditionGraphGeneratedComponent,
         EditionGraphStaticComponent,
         TwelveToneSpinnerComponent,
     ],
