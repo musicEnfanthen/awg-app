@@ -100,6 +100,10 @@ jobs:
             - name: Check edition sources
               run: |
                   yarn run check:sources
+            
+            - name: Check edition complexes
+              run: |
+                  yarn run check:complexes
 
     sonar:
         # perform SonarQube scan only for current node version, and only on non-PR runs in the main repository (token issue)

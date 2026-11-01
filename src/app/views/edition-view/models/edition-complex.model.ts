@@ -24,6 +24,20 @@ export interface EditionComplexJsonPersonRef {
 }
 
 /**
+ * The EditionComplexJsonPart interface.
+ *
+ * It is used in the context of the edition view
+ * to describe a part of a composite edition complex
+ * (e.g. a song/movement of an opus) in the edition complexes JSON data.
+ */
+export interface EditionComplexJsonPart {
+    /**
+     * The id of the edition complex of the part.
+     */
+    complex: string;
+}
+
+/**
  * The EditionComplexJsonData type.
  *
  * It is used in the context of the edition view
@@ -37,6 +51,10 @@ export type EditionComplexJsonData = Partial<
             titleStatement: { title: string; catalogueType: string; catalogueNumber: string };
             respStatement: { editors: EditionComplexJsonPersonRef[]; lastModified: string };
             pubStatement: { series: string; section: string };
+            /**
+             * The parts of a composite edition complex in their order (optional).
+             */
+            parts?: EditionComplexJsonPart[];
         }
     >
 >;
@@ -254,6 +272,24 @@ export class EditionComplex {
             ) ?? [];
         return { editors, lastModified: respStatement?.lastModified ?? '' };
     }
+}
+
+/**
+ * The EditionComplexPartOf interface.
+ *
+ * It is used in the context of the edition view
+ * to describe that an edition complex is a part of a composite edition complex.
+ */
+export interface EditionComplexPartOf {
+    /**
+     * The composite edition complex that contains the edition complex.
+     */
+    compositeComplex: EditionComplex;
+
+    /**
+     * The part number of the edition complex in the composite edition complex (starting at 1).
+     */
+    partNumber: number;
 }
 
 /**
