@@ -659,6 +659,7 @@
             "folios": [
                 {
                     "folioId": "1r",
+                    "trademarkPosition": "oben rechts",
                     "systems": "18",
                     "reversed": true,
                     "dimensions": {
@@ -1933,6 +1934,7 @@
                 },
                 {
                     "folioId": "1v",
+                    "trademarkPosition": "unten links",
                     "systems": "18",
                     "dimensions": {
                         "height": 344,
