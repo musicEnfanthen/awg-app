@@ -66,6 +66,24 @@ describe('RdfQuadsUtils (DONE)', () => {
                 expectToEqual(firstLines, ['# Generated', `@prefix awg: <${AWG}>.`]);
                 expectToBe(parsed.length, quads.length);
             });
+
+            it('... should return Turtle with the given prefixes', async () => {
+                const prov = 'http://www.w3.org/ns/prov#';
+                const statement = quad(
+                    namedNode(`${AWG}stmt_1`),
+                    namedNode(`${prov}wasAttributedTo`),
+                    namedNode(`${AWG}person_1`)
+                );
+
+                const turtle = await serializeTurtle([statement], '', { awg: AWG, prov });
+                const lines = turtle.split('\n').filter(Boolean);
+
+                expectToEqual(lines, [
+                    `@prefix awg: <${AWG}>.`,
+                    `@prefix prov: <${prov}>.`,
+                    'awg:stmt_1 prov:wasAttributedTo awg:person_1.',
+                ]);
+            });
         });
     });
 });

@@ -1,0 +1,116 @@
+<!-- content: writing process flow -->
+<div class="awg-graph-flow">
+    <h4>Schreibprozess</h4>
+    <p>
+        Die Ansicht ordnet die Niederschriften je Editionskomplex nach ihrer Abfolge; Segmente und begleitende
+        Niederschriften stehen unter der Niederschrift, zu der sie gehören.
+    </p>
+
+    @if (hasInscriptions()) {
+        @let flow = layout();
+        @let summary = focusSummary();
+
+        <div class="awg-graph-flow-panel border rounded-3">
+            <div class="awg-graph-flow-toolbar d-flex flex-wrap align-items-center gap-2 p-2 border-bottom small">
+                @if (summary) {
+                    <span class="awg-graph-flow-summary">
+                        <strong>{{ summary.label }}</strong
+                        >: <span class="awg-graph-flow-swatch is-predecessor"></span
+                        >{{ summary.predecessors }} vorausgehend ·
+                        <span class="awg-graph-flow-swatch is-successor"></span>{{ summary.successors }} nachfolgend
+                        (transitiv)
+                    </span>
+                } @else {
+                    <span class="awg-graph-flow-summary text-muted">
+                        Niederschrift überfahren oder anklicken: alle (transitiv) vorausgehenden und nachfolgenden
+                        Niederschriften werden hervorgehoben. Ziehen und Mausrad zum Verschieben und Zoomen.
+                    </span>
+                }
+                <button type="button" class="btn btn-sm btn-outline-secondary ms-auto" (click)="resetZoom()">
+                    Ansicht zurücksetzen ({{ zoomPercent() }} %)
+                </button>
+            </div>
+
+            <svg
+                class="awg-graph-flow-svg"
+                role="group"
+                aria-label="Schreibprozess: Abfolge der Niederschriften je Editionskomplex"
+                [attr.height]="svgHeight()"
+                awgSvgZoom
+                [zoomConfig]="zoomConfig"
+                [zoomTarget]="zoomGroup"
+                [(zoomValue)]="zoomValue"
+                (mouseleave)="hoveredId.set(undefined)">
+                <defs>
+                    @for (kind of markerKinds; track kind) {
+                        <marker
+                            viewBox="0 -5 10 10"
+                            refX="9"
+                            refY="0"
+                            markerWidth="7"
+                            markerHeight="7"
+                            orient="auto"
+                            [attr.id]="`${markerPrefix}-${kind}`">
+                            <path
+                                d="M0,-4L9,0L0,4"
+                                [attr.class]="`awg-graph-flow-marker awg-graph-flow-marker-${kind}`" />
+                        </marker>
+                    }
+                </defs>
+
+                <g #zoomGroup>
+                    <!-- lanes -->
+                    @for (lane of flow.lanes; track lane.y) {
+                        <g class="awg-graph-flow-lane" [class.is-odd]="$odd">
+                            <rect x="0" [attr.y]="lane.y" [attr.width]="flow.width" [attr.height]="lane.height" />
+                            <text x="12" [attr.y]="lane.y + 22">{{ lane.label }}</text>
+                        </g>
+                    }
+
+                    <!-- links -->
+                    <g class="awg-graph-flow-links">
+                        @for (link of flow.links; track $index) {
+                            @let state = linkState(link);
+                            <path
+                                [attr.d]="link.path"
+                                [attr.class]="`awg-graph-flow-link awg-graph-flow-link-${link.edge.kind} is-${state}`"
+                                [attr.marker-end]="linkMarker(link.edge.kind, state)" />
+                        }
+                    </g>
+
+                    <!-- nodes -->
+                    <g class="awg-graph-flow-nodes">
+                        @for (viewNode of viewNodes(); track viewNode.node.id) {
+                            @let node = viewNode.node;
+                            <g
+                                class="awg-graph-flow-node"
+                                [class]="`awg-graph-flow-node-${node.kind} is-${nodeState(node.id)}`"
+                                [class.is-stacked]="viewNode.depth > 0"
+                                [class.is-selected]="node.id === selectedId()"
+                                [attr.transform]="viewNode.transform"
+                                (mouseenter)="hoveredId.set(node.id)"
+                                (click)="onSelect(node.id)">
+                                <title>{{ node.label }} ({{ kindLabels[node.kind] }})</title>
+                                <rect rx="11" [attr.width]="viewNode.width" [attr.height]="sizes.nodeHeight" />
+                                <text x="9" [attr.y]="sizes.nodeHeight / 2 + 4">{{ viewNode.shortLabel }}</text>
+                            </g>
+                        }
+                    </g>
+                </g>
+            </svg>
+
+            <div class="awg-graph-flow-legend d-flex flex-wrap gap-3 p-2 border-top small text-muted">
+                @for (kind of legend; track kind) {
+                    <span>
+                        <svg width="34" height="10" aria-hidden="true">
+                            <path d="M1,5 H32" [attr.class]="`awg-graph-flow-link awg-graph-flow-link-${kind}`" />
+                        </svg>
+                        {{ edgeLabels[kind] }}
+                    </span>
+                }
+            </div>
+        </div>
+    } @else {
+        <p class="awg-graph-flow-empty text-muted">Für diesen Graphen sind keine Niederschriften verzeichnet.</p>
+    }
+</div>

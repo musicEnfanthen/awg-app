@@ -35,14 +35,19 @@ export function sortQuads(quads: Iterable<Quad>): Quad[] {
 /**
  * Utils function: serializeTurtle.
  *
- * It serializes quads as Turtle with the prefixes of the generator.
+ * It serializes quads as Turtle with the given prefixes (by default the prefixes of the generator).
  *
  * @param {readonly Quad[]} quads The given quads (sorted).
  * @param {string} [header] The optional comment header.
+ * @param {Readonly<Record<string, string>>} [prefixes] The optional prefixes by name.
  * @returns {Promise<string>} A promise of the Turtle string.
  */
-export function serializeTurtle(quads: readonly Quad[], header = ''): Promise<string> {
-    const writer = new Writer({ prefixes: { ...RDF_GENERATOR_PREFIXES } });
+export function serializeTurtle(
+    quads: readonly Quad[],
+    header = '',
+    prefixes: Readonly<Record<string, string>> = RDF_GENERATOR_PREFIXES
+): Promise<string> {
+    const writer = new Writer({ prefixes: { ...prefixes } });
     writer.addQuads([...quads]);
     return new Promise((resolve, reject) => {
         writer.end((error: Error | null, result: string) => (error ? reject(error) : resolve(header + result)));

@@ -8,6 +8,15 @@
 export type GraphQueryType = 'select' | 'construct' | 'ask' | 'describe' | 'update' | null;
 
 /**
+ * The GraphLayerMode type.
+ *
+ * It is used in the context of the edition view
+ * to select the layers of a graph: the curated triples,
+ * the triples generated from the edition data, or both merged.
+ */
+export type GraphLayerMode = 'both' | 'curated' | 'generated';
+
+/**
  * The GraphQuery class.
  *
  * It is used in the context of the edition view

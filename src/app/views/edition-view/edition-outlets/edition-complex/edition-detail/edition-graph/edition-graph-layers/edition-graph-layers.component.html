@@ -1,0 +1,25 @@
+<!-- graph layers -->
+<div class="awg-graph-layers d-flex flex-wrap align-items-center gap-2 mb-3">
+    @if (hasCuratedTriples()) {
+        <div class="awg-graph-layers-btn-group btn-group" role="radiogroup" aria-label="Triples wählen">
+            @for (option of layerOptions; track option.mode) {
+                <input
+                    type="radio"
+                    class="btn-check"
+                    autocomplete="off"
+                    [name]="groupName"
+                    [id]="`${groupName}-${option.mode}`"
+                    [value]="option.mode"
+                    [checked]="option.mode === layerMode()"
+                    (change)="layerMode.set(option.mode)" />
+                <label class="btn btn-sm btn-outline-info" [for]="`${groupName}-${option.mode}`">{{
+                    option.label
+                }}</label>
+            }
+        </div>
+    }
+    <small class="awg-graph-layers-hint text-muted">{{ hint() }}</small>
+    <button type="button" class="btn btn-sm btn-outline-info ms-auto" (click)="downloadRequest.emit()">
+        Turtle (.ttl) herunterladen
+    </button>
+</div>

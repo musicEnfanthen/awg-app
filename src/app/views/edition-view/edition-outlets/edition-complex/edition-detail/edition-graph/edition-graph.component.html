@@ -23,7 +23,21 @@
                 @for (graph of view.data.graphData?.graph || []; track graph.id) {
                     <div>
                         <awg-edition-graph-description [graph]="graph" [editionComplex]="selectedEditionComplex()" />
-                        <awg-edition-graph-dynamic [rdfData]="graph.rdfData" />
+                        @if ($first) {
+                            <!-- curated and generated layers of the complex graph -->
+                            <awg-edition-graph-layers
+                                [(layerMode)]="layerMode"
+                                [hasCuratedTriples]="hasCuratedTriples()"
+                                (downloadRequest)="onDownloadRequest()" />
+                            @if (layeredRdfData.value(); as rdfData) {
+                                <awg-edition-graph-dynamic [rdfData]="rdfData" />
+                                <awg-edition-graph-explorer-flow [rdfData]="rdfData" />
+                            } @else {
+                                <awg-twelve-tone-spinner />
+                            }
+                        } @else {
+                            <awg-edition-graph-dynamic [rdfData]="graph.rdfData" />
+                        }
                         <awg-edition-graph-static [imageKey]="graph.staticImage" />
                     </div>
                 }
