@@ -32,6 +32,10 @@
 #   über Oberproperties daher bei geladener Ontologie per UNION mit
 #   `{ ?s awg:precedes ?o } UNION { ?p rdfs:subPropertyOf awg:precedes . ?s ?p ?o }`.
 # - Abgleich mit externen Standards nur als rdfs:seeAlso (Abschnitt ABGLEICH).
+# - Externe Terme stehen nicht als eigene Einträge; die Kommentare nennen, wo sie
+#   gelten: dcterms:isPartOf und dcterms:hasPart (Gliederung, Teile, Segmente),
+#   dcterms:title (Titel von Serie, Abteilung und Komplex), dcterms:references
+#   (interne Links einer Quellenbeschreibung auf ein Sheet oder einen Komplex).
 #
 # OFFEN: Nach der Reparatur von rdfstore nur noch der spezifischste Typ; Abfragen
 #   (auch die Beispielabfragen der graph.json) dann mit Pfaden gegen diese
@@ -243,7 +247,7 @@ awg:Paratext
 
 awg:accompanies
     a owl:ObjectProperty ;
-    rdfs:label "begleitet"@de, "accompanies"@en ;
+    rdfs:label "gehört zu Skizze"@de, "accompanies"@en ;
     rdfs:comment "Skizze, zu der ein Paratext gehört (physDesc „zu …“ oder „nach …“, z. B. eine Schlussdatierung nach der letzten Stelle einer Skizze); nicht genetisch. Eine Entstehungsfolge zwischen Paratext und Skizze steht nur explizit per awg:precedes oder awg:concomitates."@de,
         "Sketch a paratext belongs to (physDesc „zu …“ or „nach …“, e.g. a final dating after the last passage of a sketch); not genetic. An order of genesis between paratext and sketch is only stated explicitly via awg:precedes or awg:concomitates."@en ;
     schema:domainIncludes awg:Paratext ;

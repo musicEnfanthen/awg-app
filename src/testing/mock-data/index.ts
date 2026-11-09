@@ -7,4 +7,5 @@
  *
  */
 export { mockEditionData } from './mockEditionData';
+export { mockRdfGeneratorData } from './mockRdfGeneratorData';
 export { mockStatisticsData } from './mockStatisticsData';
