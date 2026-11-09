@@ -29,17 +29,16 @@
 #   Form, ohne transitive Hülle. Typen: vorerst alle Obertypen als rdf:type
 #   materialisiert, weil der rdfstore-Fork Pfade mit + und * nur einen Schritt
 #   tief auswertet und | sowie ^ gar nicht kennt (geprüft 2026-11-09). Abfragen
-#   über Oberproperties daher per UNION mit
+#   über Oberproperties daher bei geladener Ontologie per UNION mit
 #   `{ ?s awg:precedes ?o } UNION { ?p rdfs:subPropertyOf awg:precedes . ?s ?p ?o }`.
 # - Abgleich mit externen Standards nur als rdfs:seeAlso (Abschnitt ABGLEICH).
 #
 # OFFEN: Nach der Reparatur von rdfstore nur noch der spezifischste Typ; Abfragen
-#   dann mit Pfaden gegen diese (mitgeladene) Ontologie, z. B.
-#   `?s a/rdfs:subClassOf* awg:Sketch` oder `?a awg:precedes+ ?b`.
+#   (auch die Beispielabfragen der graph.json) dann mit Pfaden gegen diese
+#   (mitgeladene) Ontologie, z. B. `?s a/rdfs:subClassOf* awg:Sketch` oder
+#   `?a awg:precedes+ ?b`.
 # OFFEN: Personen (außer der Zuschreibung), Archive, Papiermarken,
 #   Schreibmittel und Annotationen sind nicht modelliert.
-# OFFEN: Die Beispielabfragen der graph.json brauchen Pfade
-#   (a/rdfs:subClassOf*, awg:belongsToComplex statt dcterms:isPartOf).
 # OFFEN: Ontologie und Instanzen teilen sich einen Namespace.
 # =============================================================================
 
@@ -85,7 +84,7 @@ awg:EditionComplex
 #   die Nummer verweist nur auf die beiden Vorgänger, M 35 und M 42 sind nicht
 #   einzeln erfasst.
 # OFFEN: M-Nummern ohne eigenen Komplex (88 Studien; M 316 = op. 24/1, kuratiert
-#   heute awg:Op24_1, künftig an awg:Op24). Eigene Knoten erst mit einer M-Nummern-Registry.
+#   an awg:Op24). Eigene Knoten erst mit einer M-Nummern-Registry.
 # OFFEN: Pseudo-Komplexe (frühere Stadien mit obsoleten Opuszahlen) und ihre
 #   Relation zum späteren Komplex.
 
@@ -206,14 +205,14 @@ awg:SketchSegment
     a owl:Class ;
     rdfs:subClassOf awg:Sketch ;
     rdfs:label "Skizzensegment"@de, "sketch segment"@en ;
-    rdfs:comment "Abschnitt einer Skizze nach Takten (z. B. awg:M317_Sk4a, T. 1A–3A); dcterms:isPartOf die Skizze, Taktfolge der Segmente per awg:nextSegment. Entspricht den Partials eines Skizzen-Sheets; die Partials von Text-Sheets sind Seiten und keine Segmente."@de,
-        "Section of a sketch by measures (e.g. awg:M317_Sk4a, mm. 1A–3A); dcterms:isPartOf the sketch, measure order of the segments via awg:nextSegment. Corresponds to the partials of a sketch sheet; partials of text sheets are pages, not segments."@en .
+    rdfs:comment "Abschnitt einer Skizze nach Takten (z. B. awg:M317_Sk4a, T. 1A–3A); die Skizze dcterms:hasPart das Segment, Folge der Segmente per awg:nextSegment. Entspricht den Partials eines Skizzen-Sheets; die Partials von Text-Sheets sind Seiten und keine Segmente."@de,
+        "Section of a sketch by measures (e.g. awg:M317_Sk4a, mm. 1A–3A); the sketch dcterms:hasPart the segment, order of the segments via awg:nextSegment. Corresponds to the partials of a sketch sheet; partials of text sheets are pages, not segments."@en .
 
 awg:nextSegment
-    a owl:ObjectProperty ;
+    a owl:ObjectProperty, owl:FunctionalProperty ;
     rdfs:label "nächstes Segment"@de, "next segment"@en ;
-    rdfs:comment "Folgendes Segment derselben Skizze in Taktfolge; nicht genetisch und nicht transitiv. Eine Entstehungsfolge zwischen Segmenten steht nur explizit per awg:precedes."@de,
-        "Following segment of the same sketch in measure order; not genetic and not transitive. An order of genesis between segments is only stated explicitly via awg:precedes."@en ;
+    rdfs:comment "Direkt folgendes Segment derselben Skizze in der Reihenfolge der Partials; nicht genetisch und nicht transitiv. Eine Entstehungsfolge zwischen Segmenten steht nur explizit per awg:precedes."@de,
+        "Directly following segment of the same sketch in the order of the partials; not genetic and not transitive. An order of genesis between segments is only stated explicitly via awg:precedes."@en ;
     schema:domainIncludes awg:SketchSegment ;
     schema:rangeIncludes awg:SketchSegment .
 
@@ -235,10 +234,10 @@ awg:Paratext
     a owl:Class ;
     rdfs:subClassOf awg:Inscription ;
     rdfs:label "Paratext"@de, "paratext"@en ;
-    rdfs:comment "Nicht-musikalische Niederschrift auf einem Dokument (Titel, Datierung, Paginierung …); Art über awg:paratextType."@de,
-        "Non-musical inscription on a document (title, dating, pagination …); kind via awg:paratextType."@en .
-# OFFEN: Akkoladenstrich und Schlüssel-/Taktvorzeichnung (kuratiert als Paratext) –
-#   Paratext oder Notation?
+    rdfs:comment "Niederschrift auf einem Dokument, die zu einem Komplex oder einer Skizze gehört, sie aber nur begleitet (Titel, Datierung, Paginierung, Instrumentenvorsatz …); Zugehörigkeit zum Komplex per awg:belongsToComplex, Art über awg:paratextType."@de,
+        "Inscription on a document belonging to a complex or a sketch that it merely accompanies (title, dating, pagination, instrument indication …); membership of the complex via awg:belongsToComplex, kind via awg:paratextType."@en .
+# OFFEN: Bezug eines Paratexts zur Skizze (physDesc „zu …“, „nach …“) noch ohne
+#   eigene Property; heute nur über die genetischen Kanten.
 # OFFEN: Generierte Paratexte aus physDesc vs. kuratierte Nummerierung (_PT<n>).
 
 awg:paratextType
@@ -283,17 +282,19 @@ awg:paratextType_pagination
 awg:paratextType_instrumentation
     a skos:Concept ;
     skos:inScheme awg:ParatextTypeScheme ;
-    skos:prefLabel "Besetzungsangabe"@de, "instrumentation"@en .
+    skos:prefLabel "Instrumentenvorsatz"@de, "instrument indication"@en ;
+    skos:definition "Vorsatz vor den Systemen, der die Instrumentierung angibt, ausgeschrieben oder durch Akkoladenstrich und Schlüsselvorsatz, ggf. mit Taktvorzeichnung."@de,
+        "Indication of the instrumentation before the staves, written out or by brace and clefs, possibly with time signature."@en .
 
 awg:paratextType_measureNumbering
     a skos:Concept ;
     skos:inScheme awg:ParatextTypeScheme ;
-    skos:prefLabel "Taktzählung"@de, "measure numbering"@en .
+    skos:prefLabel "Taktzahl"@de, "measure numbering"@en .
 
 awg:paratextType_annotation
     a skos:Concept ;
     skos:inScheme awg:ParatextTypeScheme ;
-    skos:prefLabel "Anmerkung"@de, "annotation"@en .
+    skos:prefLabel "Eintragung"@de, "annotation"@en .
 
 awg:TextVersion
     a owl:Class ;
