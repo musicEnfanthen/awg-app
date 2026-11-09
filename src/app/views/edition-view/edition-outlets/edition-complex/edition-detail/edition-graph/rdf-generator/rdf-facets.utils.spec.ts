@@ -5,7 +5,7 @@ import { expectToEqual } from '@testing/expect-helper';
 import { mockRdfGeneratorData } from '@testing/mock-data';
 import { getRdfNode, shortenIri } from '@testing/rdf-generator-helper';
 
-import { collectItems, collectParatexts, collectSources } from './rdf-collect.utils';
+import { collectItems, collectParatexts, collectSketches, collectSources } from './rdf-collect.utils';
 import { createContext } from './rdf-context.utils';
 import {
     addDocumentsFacet,
@@ -15,19 +15,23 @@ import {
     addReferencesFacet,
     RDF_FACETS_UTILS,
 } from './rdf-facets.utils';
-import { RdfGeneratorContext } from './rdf-generator.model';
+import { RdfGeneratorContext, RdfGeneratorInput } from './rdf-generator.model';
 
 const AWG = 'https://edition.anton-webern.ch/webern-onto#';
 
 /**
  * Helper function: generateFacetQuads.
  *
- * It collects the mock input and adds a single facet.
+ * It collects the mock input (by default the input of the facets) and adds a single facet.
  */
-function generateFacetQuads(addFacet: (ctx: RdfGeneratorContext) => void): Quad[] {
-    const ctx = createContext(mockRdfGeneratorData.input);
+function generateFacetQuads(
+    addFacet: (ctx: RdfGeneratorContext) => void,
+    input: RdfGeneratorInput = mockRdfGeneratorData.input
+): Quad[] {
+    const ctx = createContext(input);
     ctx.sources = collectSources(ctx);
     ctx.items = collectItems(ctx);
+    ctx.sketches = collectSketches(ctx);
     ctx.paratexts = collectParatexts(ctx);
     addFacet(ctx);
     return [...ctx.quads.values()];
@@ -283,6 +287,27 @@ describe('RdfFacetsUtils (DONE)', () => {
 
                 expectToEqual(inscriptions, [writtenOn, writtenOn]);
             });
+
+            describe('... with segments', () => {
+                let segmentQuads: Quad[];
+
+                beforeAll(() => {
+                    segmentQuads = generateFacetQuads(addFoliosFacet, mockRdfGeneratorData.geneticsInput);
+                });
+
+                it('... should return the folio of segments placed on exactly one folio of the convolutes', () => {
+                    const segments = [getRdfNode(segmentQuads, 'M317_Sk2a'), getRdfNode(segmentQuads, 'Op25_SkRTa')];
+                    const writtenOn = { 'awg:writtenOn': ['awg:awg_doc_0047_38v'] };
+
+                    expectToEqual(segments, [writtenOn, writtenOn]);
+                });
+
+                it('... should return no folio for segments on several folios and for sketches of the convolutes', () => {
+                    const inscriptions = [getRdfNode(segmentQuads, 'M317_Sk2b'), getRdfNode(segmentQuads, 'M317_Sk1')];
+
+                    expectToEqual(inscriptions, [{}, {}]);
+                });
+            });
         });
 
         describe('#addEditionsFacet()', () => {
@@ -333,6 +358,53 @@ describe('RdfFacetsUtils (DONE)', () => {
                 };
 
                 expectToEqual(textVersion, expectedTextVersion);
+            });
+
+            describe('... with segments', () => {
+                let segmentQuads: Quad[];
+
+                beforeAll(() => {
+                    segmentQuads = generateFacetQuads(addEditionsFacet, mockRdfGeneratorData.geneticsInput);
+                });
+
+                it('... should return the sheets of the svg partials as parts of the sketch sheets', () => {
+                    const sheets = [
+                        getRdfNode(segmentQuads, 'M317_Sk2a_Sheet'),
+                        getRdfNode(segmentQuads, 'M317_Sk2c_Sheet'),
+                        getRdfNode(segmentQuads, 'Op25_SkRTb_Sheet'),
+                    ];
+                    const sketchEdition = ['awg:EditedMusicText', 'awg:SketchEdition'];
+
+                    expectToEqual(sheets, [
+                        {
+                            'awg:edits': ['awg:M317_Sk2a'],
+                            'dcterms:isPartOf': ['awg:M317_Sk2_Sheet'],
+                            'rdf:type': sketchEdition,
+                            'rdfs:label': ['M 317 Sk2 T. 1–2 (Skizzenedition)'],
+                        },
+                        {
+                            'awg:edits': ['awg:M317_Sk2c'],
+                            'dcterms:isPartOf': ['awg:M317_Sk2_Sheet'],
+                            'rdf:type': sketchEdition,
+                            'rdfs:label': ['M 317 Sk2c (Skizzenedition)'],
+                        },
+                        {
+                            'awg:edits': ['awg:Op25_SkRTb'],
+                            'dcterms:isPartOf': ['awg:Op25_SkRT_Sheet'],
+                            'rdf:type': sketchEdition,
+                            'rdfs:label': ['M 317 / M 321 RTb (Skizzenedition)'],
+                        },
+                    ]);
+                });
+
+                it('... should return no sheets for segments of system links and for pages of text sheets', () => {
+                    const sheets = [
+                        getRdfNode(segmentQuads, 'M320_Sk1a_Sheet'),
+                        getRdfNode(segmentQuads, 'M317_TF1a_Sheet'),
+                    ];
+
+                    expectToEqual(sheets, [{}, {}]);
+                });
             });
         });
 

@@ -147,9 +147,19 @@ function sheetContent(partial: string) {
 }
 
 /**
+ * Helper function: folioContent.
+ *
+ * It creates the content of a convolute folio with the sheet placed on it.
+ */
+function folioContent(sheetId: string) {
+    return { complexId: 'op25', sheetId, sigle: '', sigleAddendum: '', segmentSplit: 1, segments: [] };
+}
+
+/**
  * The mocked generator input for the genetics of op. 25: sketches of M 317 (own part) with numbering gaps,
  * sub-sketches and segments from svg partials and system links, sketches of M 320 (without complex),
- * a segmented sketch of M 321 (not a part in the mock) and a row table with partials.
+ * a segmented sketch of M 321 (not a part in the mock), a row table with partials
+ * and a convolute placing segments on one or two folios.
  */
 const GENETICS_INPUT: RdfGeneratorInput = {
     complexKey: 'op25',
@@ -239,7 +249,33 @@ const GENETICS_INPUT: RdfGeneratorInput = {
                 ],
             },
         },
-        folioConvolute: { convolutes: [] },
+        folioConvolute: {
+            convolutes: [
+                {
+                    convoluteId: 'A',
+                    convoluteLabel: 'A',
+                    folios: [
+                        {
+                            folioId: '38v',
+                            systems: '16',
+                            dimensions: { height: 270, width: 335 },
+                            content: [
+                                folioContent('M317_Sk1'),
+                                folioContent('M317_Sk2a'),
+                                folioContent('M317_Sk2b'),
+                                folioContent('SkRTa'),
+                            ],
+                        },
+                        {
+                            folioId: '39r',
+                            systems: '16',
+                            dimensions: { height: 270, width: 335 },
+                            content: [folioContent('M317_Sk2b')],
+                        },
+                    ],
+                },
+            ],
+        },
     },
 };
 

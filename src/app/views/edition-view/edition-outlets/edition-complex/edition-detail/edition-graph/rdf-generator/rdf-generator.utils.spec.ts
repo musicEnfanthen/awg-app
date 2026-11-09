@@ -6,7 +6,7 @@ import { mockRdfGeneratorData } from '@testing/mock-data';
 import { getRdfNode, shortenIri } from '@testing/rdf-generator-helper';
 
 import { RdfGeneratorResult } from './rdf-generator.model';
-import { generateComplexGraph, mergeGraphs, RDF_GENERATOR_UTILS } from './rdf-generator.utils';
+import { generateComplexGraph, mergeGraphs, mergeLayers, RDF_GENERATOR_UTILS } from './rdf-generator.utils';
 
 const { literal, namedNode, quad } = DataFactory;
 
@@ -19,7 +19,7 @@ const INPUT = mockRdfGeneratorData.input;
 describe('RdfGeneratorUtils (DONE)', () => {
     describe('RDF_GENERATOR_UTILS', () => {
         it('... should reference all public generator functions', () => {
-            expectToEqual(RDF_GENERATOR_UTILS, { generateComplexGraph, mergeGraphs });
+            expectToEqual(RDF_GENERATOR_UTILS, { generateComplexGraph, mergeGraphs, mergeLayers });
         });
     });
 
@@ -176,6 +176,71 @@ describe('RdfGeneratorUtils (DONE)', () => {
                 expectToBe(conflict.complexKey, 'op23, op25');
                 expectToContain(conflict.message, 'awg:awg_doc_0047_38v');
                 expectToContain(conflict.message, '16 (op23) vs. 14 (op25)');
+            });
+        });
+
+        describe('#mergeLayers()', () => {
+            const sk1 = namedNode(`${AWG}M317_Sk1`);
+            const sk2 = namedNode(`${AWG}M317_Sk2`);
+            const sk3 = namedNode(`${AWG}M317_Sk3`);
+            const label = namedNode(RDFS_LABEL);
+            const belongsToComplex = namedNode(`${AWG}belongsToComplex`);
+            const precedes = namedNode(`${AWG}precedes`);
+            const curatedSk1 = [
+                quad(sk1, label, literal('M 317 Sk1 (Verlaufsskizze)')),
+                quad(sk1, belongsToComplex, namedNode(`${AWG}Op25`)),
+                quad(sk1, namedNode(`${AWG}precedesScripture`), sk2),
+                quad(sk2, namedNode(`${AWG}precedesContent`), sk3),
+            ];
+
+            it('... should have a method `mergeLayers`', () => {
+                expect(mergeLayers).toBeDefined();
+            });
+
+            it('... should return the curated labels and complexes instead of the generated ones', () => {
+                const generated = [
+                    quad(sk1, label, literal('M 317 Sk1')),
+                    quad(sk1, belongsToComplex, namedNode(`${AWG}M317`)),
+                    quad(sk2, label, literal('M 317 Sk2')),
+                ];
+
+                const merged = mergeLayers(curatedSk1, generated);
+                const mergedSketches = [getRdfNode(merged, 'M317_Sk1'), getRdfNode(merged, 'M317_Sk2')];
+
+                expectToEqual(mergedSketches, [
+                    {
+                        'awg:belongsToComplex': ['awg:Op25'],
+                        'awg:precedesScripture': ['awg:M317_Sk2'],
+                        'rdfs:label': ['M 317 Sk1 (Verlaufsskizze)'],
+                    },
+                    { 'awg:precedesContent': ['awg:M317_Sk3'], 'rdfs:label': ['M 317 Sk2'] },
+                ]);
+            });
+
+            it('... should return no generated precedence where the curated layer states a more specific one', () => {
+                const generated = [quad(sk1, precedes, sk2), quad(sk2, precedes, sk3), quad(sk1, precedes, sk3)];
+
+                const merged = mergeLayers(curatedSk1, generated);
+                const precedences = merged
+                    .filter(q => q.predicate.equals(precedes))
+                    .map(q => `${shortenIri(q.subject.value)} ${shortenIri(q.object.value)}`);
+
+                expectToEqual(precedences, ['awg:M317_Sk1 awg:M317_Sk3']);
+            });
+
+            it('... should return the union of both layers without duplicates, sorted', () => {
+                const generated = [quad(sk3, label, literal('M 317 Sk3')), ...curatedSk1];
+
+                const merged = mergeLayers(curatedSk1, generated);
+                const subjects = merged.map(q => shortenIri(q.subject.value));
+
+                expectToEqual(subjects, [
+                    'awg:M317_Sk1',
+                    'awg:M317_Sk1',
+                    'awg:M317_Sk1',
+                    'awg:M317_Sk2',
+                    'awg:M317_Sk3',
+                ]);
             });
         });
     });

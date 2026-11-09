@@ -162,6 +162,21 @@ export function stripHtml(html: string | undefined): string {
 }
 
 /**
+ * Utils function: segmentLabel.
+ *
+ * It gets the label of a sketch segment: the sketch label with the measures of the segment
+ * (e.g. `M 317 Sk4 T. 1A–3A`), or with its partial letter if the data name no measures (e.g. `M 317 Sk4a`).
+ *
+ * @param {string} sketchLabel The given label of the sketch.
+ * @param {string} letter The given partial letter of the segment.
+ * @param {string} measures The given measures of the segment.
+ * @returns {string} The label.
+ */
+export function segmentLabel(sketchLabel: string, letter: string, measures: string): string {
+    return measures ? `${sketchLabel} T. ${measures}` : `${sketchLabel}${letter}`;
+}
+
+/**
  * Utils function: parseItemLabel.
  *
  * It parses the plain label of a content item of a source description.
@@ -281,5 +296,6 @@ export const RDF_TEXT_UTILS = {
     parseParatextText,
     parseReference,
     parseStatedDate,
+    segmentLabel,
     stripHtml,
 } as const;

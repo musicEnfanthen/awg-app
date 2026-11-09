@@ -13,10 +13,12 @@ import {
     complexIri,
     complexLabel,
     documentLabel,
+    getOrCreate,
     knownComplexKey,
+    onlyValue,
     warn,
 } from './rdf-context.utils';
-import { RdfGeneratorContext, RdfSourceEntry } from './rdf-generator.model';
+import { RdfGeneratorContext, RdfSketchEntry, RdfSourceEntry } from './rdf-generator.model';
 import {
     complexKeyOfMnr,
     complexLocal,
@@ -25,11 +27,12 @@ import {
     folioLocal,
     placementLocal,
     sectionLocal,
+    segmentLocal,
     seriesLocal,
     sheetLocal,
     textVersionLocal,
 } from './rdf-iri.utils';
-import { stripHtml } from './rdf-text.utils';
+import { segmentLabel, stripHtml } from './rdf-text.utils';
 import { awg, AWG_CLASSES, AWG_INSTANCES, AWG_PROPERTIES, EXTERNAL_TERMS } from './rdf-vocab';
 
 /**
@@ -289,10 +292,24 @@ function addFolio(ctx: RdfGeneratorContext, source: RdfSourceEntry, folio: strin
 }
 
 /**
+ * Helper function: segmentLocals.
+ *
+ * It gets the local names of the segments of all sketches and row tables.
+ */
+function segmentLocals(ctx: RdfGeneratorContext): Set<string> {
+    const locals = new Set<string>();
+    ctx.sketches.forEach(({ item, measuresBySegment }) => {
+        measuresBySegment.forEach((_measures, letter) => locals.add(segmentLocal(item.local, letter)));
+    });
+    return locals;
+}
+
+/**
  * Utils function: addFoliosFacet.
  *
  * It adds the folios with their placements of sketches and paratexts,
- * and the number of staves and dimensions from the folio convolutes.
+ * and the number of staves and dimensions from the folio convolutes;
+ * a sketch segment is written on its folio only if the convolutes place it on exactly one.
  *
  * @param {RdfGeneratorContext} ctx The given generator context.
  * @returns {void} Adds the quads of the facet to the context.
@@ -333,6 +350,10 @@ export function addFoliosFacet(ctx: RdfGeneratorContext): void {
         }
     });
 
+    const segments = segmentLocals(ctx);
+    // Per segment: the folios of the convolutes it is placed on
+    const foliosBySegment = new Map<string, Set<string>>();
+
     ctx.input.data.folioConvolute?.convolutes?.forEach(convolute => {
         if (!convolute.folios?.length) {
             return;
@@ -343,7 +364,14 @@ export function addFoliosFacet(ctx: RdfGeneratorContext): void {
             return;
         }
         convolute.folios.forEach(folio => {
-            const iri = awg(addFolio(ctx, source, folio.folioId));
+            const folioName = addFolio(ctx, source, folio.folioId);
+            const iri = awg(folioName);
+            folio.content?.forEach(({ sheetId }) => {
+                const edited = editedLocal(ctx.complexLocal, sheetId);
+                if (segments.has(edited)) {
+                    getOrCreate(foliosBySegment, edited, () => new Set()).add(folioName);
+                }
+            });
             if (/^\d+$/.test(folio.systems)) {
                 add(
                     ctx,
@@ -368,12 +396,35 @@ export function addFoliosFacet(ctx: RdfGeneratorContext): void {
             }
         });
     });
+
+    foliosBySegment.forEach((folioNames, segment) => {
+        const folioName = onlyValue(folioNames);
+        if (folioName) {
+            add(ctx, awg(segment), AWG_PROPERTIES.writtenOn, awg(folioName));
+        }
+    });
+}
+
+/**
+ * Helper function: addSegmentSheet.
+ *
+ * It adds the sheet of a sketch segment (a partial of a sketch sheet) as part of the sheet of the sketch.
+ */
+function addSegmentSheet(ctx: RdfGeneratorContext, sketch: RdfSketchEntry, letter: string): void {
+    const { type, label } = SHEET_CLASSES.sketchEditions;
+    const segment = segmentLocal(sketch.item.local, letter);
+    const iri = awg(sheetLocal(segment));
+    const measures = sketch.measuresBySegment.get(letter)?.join(', ') ?? '';
+    addTypes(ctx, iri, type);
+    addLabel(ctx, iri, `${segmentLabel(sketch.item.label, letter, measures)} (${label})`);
+    add(ctx, iri, AWG_PROPERTIES.edits, awg(segment));
+    add(ctx, iri, EXTERNAL_TERMS.isPartOf, awg(sheetLocal(sketch.item.local)));
 }
 
 /**
  * Utils function: addEditionsFacet.
  *
- * It adds the sheets with what they edit (sketches, row tables, text versions)
+ * It adds the sheets with what they edit (sketches, row tables, text versions, sketch segments)
  * and the sources transmitting the text versions.
  *
  * @param {RdfGeneratorContext} ctx The given generator context.
@@ -394,6 +445,16 @@ export function addEditionsFacet(ctx: RdfGeneratorContext): void {
             if (editionType !== 'sketchEditions' && textVersionMnr) {
                 addTextVersion(ctx, edited, textVersionMnr);
                 addLabel(ctx, awg(edited), label);
+            }
+        });
+    });
+
+    sheets?.sketchEditions?.forEach(sheet => {
+        const edited = editedLocal(ctx.complexLocal, sheet.id);
+        const sketch = ctx.sketches.get(edited);
+        sheet.content?.forEach(({ partial }) => {
+            if (sketch && partial) {
+                addSegmentSheet(ctx, sketch, partial);
             }
         });
     });

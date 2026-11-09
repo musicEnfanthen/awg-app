@@ -11,6 +11,7 @@ import {
     parseReference,
     parseStatedDate,
     RDF_TEXT_UTILS,
+    segmentLabel,
     stripHtml,
 } from './rdf-text.utils';
 
@@ -23,6 +24,7 @@ describe('RdfTextUtils (DONE)', () => {
                 parseParatextText,
                 parseReference,
                 parseStatedDate,
+                segmentLabel,
                 stripHtml,
             });
         });
@@ -242,6 +244,23 @@ describe('RdfTextUtils (DONE)', () => {
                     const result = parseStatedDate(text);
 
                     expectToBe(result, null);
+                });
+            });
+        });
+
+        describe('#segmentLabel()', () => {
+            it('... should have a method `segmentLabel`', () => {
+                expect(segmentLabel).toBeDefined();
+            });
+
+            describe('... should return the label of a segment', () => {
+                it.each([
+                    { desc: 'with its measures', measures: '1A–3A', expected: 'M 317 Sk4 T. 1A–3A' },
+                    { desc: 'with its partial letter without measures', measures: '', expected: 'M 317 Sk4a' },
+                ])('... $desc', ({ measures, expected }) => {
+                    const label = segmentLabel('M 317 Sk4', 'a', measures);
+
+                    expectToBe(label, expected);
                 });
             });
         });

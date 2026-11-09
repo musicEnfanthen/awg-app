@@ -3,6 +3,7 @@ import { DataFactory } from 'n3';
 import { add, addLabel, addTypes, complexIri, getOrCreate, ownComplexKeys, warn } from './rdf-context.utils';
 import { RdfGeneratorContext, RdfSketchEntry } from './rdf-generator.model';
 import { segmentLocal, sketchLocal } from './rdf-iri.utils';
+import { segmentLabel } from './rdf-text.utils';
 import { awg, AWG_CLASSES, AWG_PROPERTIES, EXTERNAL_TERMS } from './rdf-vocab';
 
 /**
@@ -47,7 +48,7 @@ function addSegments(ctx: RdfGeneratorContext): void {
             const measures = measureList.join(', ');
             add(ctx, awg(item.local), EXTERNAL_TERMS.hasPart, iri);
             addTypes(ctx, iri, AWG_CLASSES.sketchSegment);
-            addLabel(ctx, iri, measures ? `${item.label} T. ${measures}` : `${item.label}${letter}`);
+            addLabel(ctx, iri, segmentLabel(item.label, letter, measures));
             add(ctx, iri, AWG_PROPERTIES.measures, DataFactory.literal(measures));
             if (item.complexKey) {
                 add(ctx, iri, AWG_PROPERTIES.belongsToComplex, complexIri(ctx, item.complexKey));

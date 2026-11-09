@@ -180,6 +180,40 @@ export function mergeGraphs(results: readonly RdfGeneratorResult[]): RdfGenerato
 }
 
 /**
+ * Utils function: mergeLayers.
+ *
+ * It merges the curated and the generated layer of a graph without duplicates.
+ * The curated layer wins where both state the same: generated labels and complexes are dropped
+ * for nodes with curated ones, and a generated `awg:precedes` is dropped where the curated layer
+ * states a more specific precedence between the same nodes.
+ *
+ * @param {readonly Quad[]} curated The given quads of the curated layer.
+ * @param {readonly Quad[]} generated The given quads of the generated layer.
+ * @returns {Quad[]} The merged quads, sorted.
+ */
+export function mergeLayers(curated: readonly Quad[], generated: readonly Quad[]): Quad[] {
+    const { belongsToComplex, precedes, precedesContent, precedesScripture } = AWG_PROPERTIES;
+    const curatedSlots = new Set<string>();
+    const curatedPrecedences = new Set<string>();
+    curated.forEach(q => {
+        if (q.predicate.equals(RDFS_LABEL) || q.predicate.equals(belongsToComplex)) {
+            curatedSlots.add(slotKey(q));
+        } else if (q.predicate.equals(precedesContent) || q.predicate.equals(precedesScripture)) {
+            curatedPrecedences.add(`${q.subject.value} ${q.object.value}`);
+        }
+    });
+
+    const isOverridden = (q: Quad): boolean =>
+        curatedSlots.has(slotKey(q)) ||
+        (q.predicate.equals(precedes) && curatedPrecedences.has(`${q.subject.value} ${q.object.value}`));
+
+    const quads = new Map<string, Quad>();
+    curated.forEach(q => quads.set(quadKey(q), q));
+    generated.filter(q => !isOverridden(q)).forEach(q => quads.set(quadKey(q), q));
+    return sortQuads(quads.values());
+}
+
+/**
  * Object constant: RDF_GENERATOR_UTILS.
  *
  * It keeps all public functions of the generator.
@@ -187,4 +221,5 @@ export function mergeGraphs(results: readonly RdfGeneratorResult[]): RdfGenerato
 export const RDF_GENERATOR_UTILS = {
     generateComplexGraph,
     mergeGraphs,
+    mergeLayers,
 } as const;

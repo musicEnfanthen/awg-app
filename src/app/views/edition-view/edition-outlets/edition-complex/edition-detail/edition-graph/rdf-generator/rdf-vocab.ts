@@ -96,6 +96,8 @@ export const AWG_PROPERTIES = {
     partOfComplex: awg('partOfComplex'),
     placementOf: awg('placementOf'),
     precedes: awg('precedes'),
+    precedesContent: awg('precedesContent'),
+    precedesScripture: awg('precedesScripture'),
     siglum: awg('siglum'),
     siglumAddendum: awg('siglumAddendum'),
     sourceType: awg('sourceType'),
