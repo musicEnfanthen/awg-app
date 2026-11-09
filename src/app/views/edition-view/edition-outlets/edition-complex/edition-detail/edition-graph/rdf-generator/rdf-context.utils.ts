@@ -24,7 +24,14 @@ import { awg, AWG_SUPERCLASSES } from './rdf-vocab';
  *
  * It keeps all facets of the generated graph.
  */
-const ALL_FACETS: readonly RdfGeneratorFacet[] = ['edition', 'documents', 'folios', 'editions', 'references'];
+const ALL_FACETS: readonly RdfGeneratorFacet[] = [
+    'edition',
+    'documents',
+    'folios',
+    'editions',
+    'references',
+    'genetics',
+];
 
 /**
  * Utils function: add.
@@ -166,6 +173,20 @@ export function complexEntry(ctx: RdfGeneratorContext, complexKey: string): RdfC
 }
 
 /**
+ * Utils function: ownComplexKeys.
+ *
+ * It gets the keys of the complex and its parts, whose data hold the complete sketch inventory.
+ *
+ * @param {RdfGeneratorContext} ctx The given generator context.
+ * @returns {Set<string>} The keys of the complex and its parts.
+ */
+export function ownComplexKeys(ctx: RdfGeneratorContext): Set<string> {
+    const keys = new Set([ctx.input.complexKey]);
+    complexEntry(ctx, ctx.input.complexKey)?.parts?.forEach(part => keys.add(part.complex));
+    return keys;
+}
+
+/**
  * Utils function: complexLabel.
  *
  * It gets the label of a complex as in the app (e.g. `op. 25`, `M 317`, `M* 409`), or its key if unknown.
@@ -248,6 +269,7 @@ export function createContext(input: RdfGeneratorInput): RdfGeneratorContext {
         paratexts: [],
         quads: new Map(),
         referencedComplexes: new Set(),
+        sketches: new Map(),
         sources: [],
         warnings: [],
     };
@@ -272,5 +294,6 @@ export const RDF_CONTEXT_UTILS = {
     knownComplexKey,
     nextCount,
     onlyValue,
+    ownComplexKeys,
     warn,
 } as const;

@@ -11,14 +11,22 @@ import {
     onlyValue,
     warn,
 } from './rdf-context.utils';
-import { RdfGeneratorContext, RdfItemEntry, RdfParatextEntry, RdfSourceEntry } from './rdf-generator.model';
+import {
+    RdfGeneratorContext,
+    RdfItemEntry,
+    RdfParatextEntry,
+    RdfSketchEntry,
+    RdfSourceEntry,
+} from './rdf-generator.model';
 import {
     complexKeyOfMnr,
+    editedLocal,
     folioLocal,
     mnrLocal,
     paratextLocal,
     placeholderSketchLocal,
     rowTableLocal,
+    segmentLetter,
     sketchLocal,
     sourceLocal,
 } from './rdf-iri.utils';
@@ -180,6 +188,84 @@ export function collectItems(ctx: RdfGeneratorContext): RdfItemEntry[] {
 }
 
 /**
+ * Helper function: createSketchEntry.
+ *
+ * It creates the entry of a sketch or row table, with M number and sketch number of a numbered sketch.
+ */
+function createSketchEntry(item: RdfItemEntry): RdfSketchEntry {
+    const parsed = parseItemLabel(item.label);
+    if (parsed.kind !== 'sketch') {
+        return { item, measuresBySegment: new Map() };
+    }
+    return {
+        item,
+        measuresBySegment: new Map(),
+        mnr: mnrLocal(parsed.prefix, parsed.number),
+        sketchNumber: parsed.sketchNumber,
+    };
+}
+
+/**
+ * Helper function: addSegmentMeasure.
+ *
+ * It records a segment of a sketch named by a sheet id, with the measures of a system if given.
+ */
+function addSegmentMeasure(
+    ctx: RdfGeneratorContext,
+    sketch: RdfSketchEntry,
+    sheetId: string | undefined,
+    measure?: string
+): void {
+    if (!sheetId) {
+        return;
+    }
+    const letter = segmentLetter(sketch.item.local, editedLocal(ctx.complexLocal, sheetId));
+    if (!letter) {
+        return;
+    }
+    const measures = getOrCreate(sketch.measuresBySegment, letter, () => []);
+    const plainMeasure = stripHtml(measure);
+    if (plainMeasure && !measures.includes(plainMeasure)) {
+        measures.push(plainMeasure);
+    }
+}
+
+/**
+ * Utils function: collectSketches.
+ *
+ * It collects the sketches and row tables of the content items once each, with their segments:
+ * the partials of the svg sketch sheets and the sheet ids of the content items and their systems
+ * (`itemLinkTo`, `linkTo`), with the measures of those systems.
+ *
+ * @param {RdfGeneratorContext} ctx The given generator context.
+ * @returns {Map<string, RdfSketchEntry>} The sketches by local name.
+ */
+export function collectSketches(ctx: RdfGeneratorContext): Map<string, RdfSketchEntry> {
+    const sketches = new Map<string, RdfSketchEntry>();
+
+    ctx.items.forEach(item => {
+        const sketch = getOrCreate(sketches, item.local, () => createSketchEntry(item));
+        addSegmentMeasure(ctx, sketch, item.content.itemLinkTo?.sheetId);
+        item.content.folios?.forEach(folio => {
+            folio.systemGroups?.flat().forEach(system => {
+                addSegmentMeasure(ctx, sketch, system.linkTo, system.measure);
+            });
+        });
+    });
+
+    ctx.input.data.svgSheets?.sheets?.sketchEditions?.forEach(sheet => {
+        const sketch = sketches.get(editedLocal(ctx.complexLocal, sheet.id));
+        sheet.content?.forEach(content => {
+            if (sketch && content.partial) {
+                addSegmentMeasure(ctx, sketch, `${sheet.id}${content.partial}`);
+            }
+        });
+    });
+
+    return sketches;
+}
+
+/**
  * Utils function: collectParatexts.
  *
  * It resolves the paratexts of the physical descriptions (titles, datings, paginations,
@@ -279,5 +365,6 @@ export function collectParatexts(ctx: RdfGeneratorContext): RdfParatextEntry[] {
 export const RDF_COLLECT_UTILS = {
     collectItems,
     collectParatexts,
+    collectSketches,
     collectSources,
 } as const;

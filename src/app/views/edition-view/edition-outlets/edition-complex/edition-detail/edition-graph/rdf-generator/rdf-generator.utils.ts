@@ -1,6 +1,6 @@
 import type { NamedNode, Quad } from '@rdfjs/types';
 
-import { collectItems, collectParatexts, collectSources } from './rdf-collect.utils';
+import { collectItems, collectParatexts, collectSketches, collectSources } from './rdf-collect.utils';
 import { RDFS_LABEL } from '../graph-visualizer/utils/term.utils';
 import { createContext, getOrCreate, has } from './rdf-context.utils';
 import {
@@ -16,6 +16,7 @@ import {
     RdfGeneratorWarning,
     RdfGeneratorWarningRule,
 } from './rdf-generator.model';
+import { addGeneticsFacet } from './rdf-genetics.utils';
 import { quadKey, sortQuads } from './rdf-quads.utils';
 import { AWG_PROPERTIES, RDF_GENERATOR_PREFIXES } from './rdf-vocab';
 
@@ -103,6 +104,7 @@ export function generateComplexGraph(input: RdfGeneratorInput): RdfGeneratorResu
     const ctx = createContext(input);
     ctx.sources = collectSources(ctx);
     ctx.items = collectItems(ctx);
+    ctx.sketches = collectSketches(ctx);
     ctx.paratexts = collectParatexts(ctx);
 
     if (has(ctx, 'documents')) {
@@ -116,6 +118,9 @@ export function generateComplexGraph(input: RdfGeneratorInput): RdfGeneratorResu
     }
     if (has(ctx, 'references')) {
         addReferencesFacet(ctx);
+    }
+    if (has(ctx, 'genetics')) {
+        addGeneticsFacet(ctx);
     }
     if (has(ctx, 'edition')) {
         addEditionFacet(ctx);

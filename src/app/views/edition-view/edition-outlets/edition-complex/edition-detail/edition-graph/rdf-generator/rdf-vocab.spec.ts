@@ -54,6 +54,7 @@ describe('RdfVocab (DONE)', () => {
             const expectedSuperclasses = {
                 'awg:CompositeEditionComplex': ['awg:EditionComplex'],
                 'awg:Sketch': ['awg:Inscription'],
+                'awg:SketchSegment': ['awg:Sketch', 'awg:Inscription'],
                 'awg:RowTable': ['awg:Sketch', 'awg:Inscription'],
                 'awg:Paratext': ['awg:Inscription'],
                 'awg:SketchEdition': ['awg:EditedMusicText'],

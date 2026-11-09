@@ -19,6 +19,7 @@ import {
     knownComplexKey,
     nextCount,
     onlyValue,
+    ownComplexKeys,
     RDF_CONTEXT_UTILS,
     warn,
 } from './rdf-context.utils';
@@ -52,6 +53,7 @@ describe('RdfContextUtils (DONE)', () => {
                 knownComplexKey,
                 nextCount,
                 onlyValue,
+                ownComplexKeys,
                 warn,
             });
         });
@@ -74,7 +76,7 @@ describe('RdfContextUtils (DONE)', () => {
                     complexLocal: 'Op25',
                     documentsById: ['awg_doc_0047', 'awg_doc_0048'],
                     documentsByUse: ['op25:A', 'op25:B'],
-                    facets: ['edition', 'documents', 'folios', 'editions', 'references'],
+                    facets: ['edition', 'documents', 'folios', 'editions', 'references', 'genetics'],
                 };
 
                 expectToEqual(lookups, expectedLookups);
@@ -254,6 +256,24 @@ describe('RdfContextUtils (DONE)', () => {
                 const entry = complexEntry(ctx, 'm317');
 
                 expectToBe(entry, mockRdfGeneratorData.complexes['m317']);
+            });
+        });
+
+        describe('#ownComplexKeys()', () => {
+            it('... should have a method `ownComplexKeys`', () => {
+                expect(ownComplexKeys).toBeDefined();
+            });
+
+            it('... should return the keys of the composite complex and its parts', () => {
+                const keys = ownComplexKeys(ctx);
+
+                expectToEqual([...keys], ['op25', 'm317']);
+            });
+
+            it('... should return only the key of a complex without parts', () => {
+                const keys = ownComplexKeys(createContext({ ...mockRdfGeneratorData.input, complexKey: 'm317' }));
+
+                expectToEqual([...keys], ['m317']);
             });
         });
 

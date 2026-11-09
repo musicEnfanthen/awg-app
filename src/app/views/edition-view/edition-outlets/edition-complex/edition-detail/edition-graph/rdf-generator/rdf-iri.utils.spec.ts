@@ -15,6 +15,8 @@ import {
     RDF_IRI_UTILS,
     rowTableLocal,
     sectionLocal,
+    segmentLetter,
+    segmentLocal,
     seriesLocal,
     sheetLocal,
     sketchLocal,
@@ -38,6 +40,8 @@ describe('RdfIriUtils (DONE)', () => {
                 placementLocal,
                 rowTableLocal,
                 sectionLocal,
+                segmentLetter,
+                segmentLocal,
                 seriesLocal,
                 sheetLocal,
                 sketchLocal,
@@ -155,6 +159,69 @@ describe('RdfIriUtils (DONE)', () => {
                 const result = rowTableLocal('Op25');
 
                 expectToBe(result, 'Op25_SkRT');
+            });
+        });
+
+        describe('#segmentLocal()', () => {
+            it('... should have a method `segmentLocal`', () => {
+                expect(segmentLocal).toBeDefined();
+            });
+
+            describe('... should return', () => {
+                it.each([
+                    { desc: 'a sketch segment', sketch: 'M317_Sk4', expected: 'M317_Sk4a' },
+                    { desc: 'a row table segment', sketch: 'Op24_SkRT', expected: 'Op24_SkRTa' },
+                ])('... $desc', ({ sketch, expected }) => {
+                    const result = segmentLocal(sketch, 'a');
+
+                    expectToBe(result, expected);
+                });
+            });
+        });
+
+        describe('#segmentLetter()', () => {
+            it('... should have a method `segmentLetter`', () => {
+                expect(segmentLetter).toBeDefined();
+            });
+
+            describe('... should return', () => {
+                it.each([
+                    { desc: 'the letter of a sketch segment', sketch: 'M317_Sk4', local: 'M317_Sk4a', expected: 'a' },
+                    {
+                        desc: 'the letter of a row table segment',
+                        sketch: 'Op24_SkRT',
+                        local: 'Op24_SkRTb',
+                        expected: 'b',
+                    },
+                    {
+                        desc: 'undefined for the sketch itself',
+                        sketch: 'M317_Sk4',
+                        local: 'M317_Sk4',
+                        expected: undefined,
+                    },
+                    {
+                        desc: 'undefined for a sub-sketch',
+                        sketch: 'M317_Sk4',
+                        local: 'M317_Sk4_1',
+                        expected: undefined,
+                    },
+                    {
+                        desc: 'undefined for a higher number',
+                        sketch: 'M112_Sk1',
+                        local: 'M112_Sk10a',
+                        expected: undefined,
+                    },
+                    {
+                        desc: 'undefined for another sketch',
+                        sketch: 'M317_Sk4',
+                        local: 'M322_Sk3a',
+                        expected: undefined,
+                    },
+                ])('... $desc', ({ sketch, local, expected }) => {
+                    const result = segmentLetter(sketch, local);
+
+                    expect(result).toBe(expected);
+                });
             });
         });
 

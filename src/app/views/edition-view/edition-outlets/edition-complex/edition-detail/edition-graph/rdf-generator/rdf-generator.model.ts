@@ -11,10 +11,11 @@ import type { SourceList } from '@awg-views/edition-view/models/source-list.mode
  *
  * It represents a switchable part of the generated graph:
  * the edition structure (`edition`), sources, documents, sketches and paratexts (`documents`),
- * folios and placements (`folios`), sheets and text versions (`editions`)
- * and links in the source descriptions (`references`).
+ * folios and placements (`folios`), sheets and text versions (`editions`),
+ * links in the source descriptions (`references`)
+ * and sketch segments with the genetic relations derived from the numbering (`genetics`).
  */
-export type RdfGeneratorFacet = 'edition' | 'documents' | 'folios' | 'editions' | 'references';
+export type RdfGeneratorFacet = 'edition' | 'documents' | 'folios' | 'editions' | 'references' | 'genetics';
 
 /**
  * The RdfComplexEntry type.
@@ -112,6 +113,7 @@ export type RdfGeneratorWarningRule =
     | 'noComplex'
     | 'noDocument'
     | 'noFolio'
+    | 'noParentSketch'
     | 'placeholder'
     | 'unknownConvolute'
     | 'unknownItem'
@@ -304,6 +306,33 @@ export interface RdfItemEntry {
 }
 
 /**
+ * The RdfSketchEntry interface.
+ *
+ * It represents a sketch or row table of the complex with its segments.
+ */
+export interface RdfSketchEntry {
+    /**
+     * The first content item of the sketch (a sketch can be described in several content items).
+     */
+    item: RdfItemEntry;
+
+    /**
+     * The measures of the segments by partial letter (empty if the data name no measures).
+     */
+    measuresBySegment: Map<string, string[]>;
+
+    /**
+     * The local name of the M number of a numbered sketch.
+     */
+    mnr?: string;
+
+    /**
+     * The sketch number with dots of a numbered sketch (e.g. `2.1`).
+     */
+    sketchNumber?: string;
+}
+
+/**
  * The RdfParatextEntry interface.
  *
  * It represents a paratext of a physical description.
@@ -410,6 +439,11 @@ export interface RdfGeneratorContext {
      * The paratexts of the physical descriptions.
      */
     paratexts: RdfParatextEntry[];
+
+    /**
+     * The sketches and row tables of the content items with their segments, by local name.
+     */
+    sketches: Map<string, RdfSketchEntry>;
 
     /**
      * The sources of the complex.

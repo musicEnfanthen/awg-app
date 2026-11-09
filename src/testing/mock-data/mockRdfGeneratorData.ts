@@ -1,7 +1,7 @@
 import { RdfComplexRegistry, RdfDocumentEntry, RdfGeneratorInput } from '@awg-graph/rdf-generator/rdf-generator.model';
 
 /**
- * The registry of the mocked edition complexes (op. 24, op. 25 with part M 317, M 317).
+ * The registry of the mocked edition complexes (op. 24, op. 25 with part M 317, M 317, M 321).
  */
 const COMPLEXES: RdfComplexRegistry = {
     op24: {
@@ -15,6 +15,10 @@ const COMPLEXES: RdfComplexRegistry = {
     },
     m317: {
         titleStatement: { title: '„Wie bin ich froh!“', catalogueType: 'MNR', catalogueNumber: '317' },
+        pubStatement: { series: '1', section: '5' },
+    },
+    m321: {
+        titleStatement: { title: '„Sieh, die Sternlein“', catalogueType: 'MNR', catalogueNumber: '321' },
         pubStatement: { series: '1', section: '5' },
     },
 };
@@ -134,10 +138,117 @@ const INPUT: RdfGeneratorInput = {
 };
 
 /**
+ * Helper function: sheetContent.
+ *
+ * It creates the content of an svg sheet with a partial.
+ */
+function sheetContent(partial: string) {
+    return { svg: '', image: '', partial, convolute: '' };
+}
+
+/**
+ * The mocked generator input for the genetics of op. 25: sketches of M 317 (own part) with numbering gaps,
+ * sub-sketches and segments from svg partials and system links, sketches of M 320 (without complex),
+ * a segmented sketch of M 321 (not a part in the mock) and a row table with partials.
+ */
+const GENETICS_INPUT: RdfGeneratorInput = {
+    complexKey: 'op25',
+    complexes: COMPLEXES,
+    documents: DOCUMENTS,
+    data: {
+        sourceList: INPUT.data.sourceList,
+        sourceDesc: {
+            sources: [
+                {
+                    id: 'source_A',
+                    siglum: 'A',
+                    type: '',
+                    location: '',
+                    physDesc: {
+                        contents: [
+                            { item: 'M 317 Sk1' },
+                            {
+                                item: 'M 317 Sk2',
+                                itemLinkTo: { complexId: 'op25', sheetId: 'M317_Sk2a' },
+                                folios: [
+                                    {
+                                        folio: '38v',
+                                        systemGroups: [
+                                            [{ system: '3', measure: '3–4', linkTo: 'M317_Sk2b' }],
+                                            [{ system: '1', measure: '1–2', linkTo: 'M317_Sk2a' }],
+                                        ],
+                                    },
+                                ],
+                            },
+                            { item: 'M 317 Sk2.1' },
+                            { item: 'M 317 Sk2.1.1' },
+                            { item: 'M 317 Sk3' },
+                            { item: 'M 317 Sk5' },
+                            { item: 'M 317 Sk4.2.1' },
+                            {
+                                item: 'M 320 Sk1',
+                                folios: [
+                                    {
+                                        folio: '39r',
+                                        systemGroups: [
+                                            [{ system: '1', measure: '1', linkTo: 'M320_Sk1a' }],
+                                            [{ system: '5', measure: '5', linkTo: 'M320_Sk1c' }],
+                                        ],
+                                    },
+                                ],
+                            },
+                            { item: 'M 320 Sk2' },
+                            { item: 'M 320 Sk1.1' },
+                            { item: 'M 321 Sk1', itemLinkTo: { complexId: 'op25', sheetId: 'M321_Sk1a' } },
+                            { item: 'M 317 / M321 RT', itemLinkTo: { complexId: 'op25', sheetId: 'SkRT' } },
+                        ],
+                    },
+                },
+                {
+                    id: 'source_B',
+                    siglum: 'B',
+                    type: '',
+                    location: '',
+                    physDesc: {
+                        contents: [
+                            {
+                                item: 'M 317 Sk2',
+                                folios: [
+                                    {
+                                        folio: '1r',
+                                        systemGroups: [[{ system: '2', measure: '5', linkTo: 'M317_Sk2b' }]],
+                                    },
+                                ],
+                            },
+                        ],
+                    },
+                },
+            ],
+        },
+        svgSheets: {
+            sheets: {
+                workEditions: [],
+                textEditions: [{ id: 'M317_TF1', label: 'M 317 Textfassung 1', content: [sheetContent('a')] }],
+                sketchEditions: [
+                    {
+                        id: 'M317_Sk2',
+                        label: 'M 317 Sk2',
+                        content: [sheetContent('a'), sheetContent('b'), sheetContent('c')],
+                    },
+                    { id: 'SkRT', label: 'M 317 / M 321 RT', content: [sheetContent('a'), sheetContent('b')] },
+                ],
+            },
+        },
+        folioConvolute: { convolutes: [] },
+    },
+};
+
+/**
  * The mocked data of the RDF generator.
  */
 export const mockRdfGeneratorData = {
     complexes: COMPLEXES,
     documents: DOCUMENTS,
+    geneticsInput: GENETICS_INPUT,
     input: INPUT,
 };

@@ -3,7 +3,13 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { expectToEqual } from '@testing/expect-helper';
 import { mockRdfGeneratorData } from '@testing/mock-data';
 
-import { collectItems, collectParatexts, collectSources, RDF_COLLECT_UTILS } from './rdf-collect.utils';
+import {
+    collectItems,
+    collectParatexts,
+    collectSketches,
+    collectSources,
+    RDF_COLLECT_UTILS,
+} from './rdf-collect.utils';
 import { createContext } from './rdf-context.utils';
 import { RdfGeneratorContext, RdfGeneratorInput } from './rdf-generator.model';
 
@@ -25,7 +31,7 @@ function collectAll(input: RdfGeneratorInput): RdfGeneratorContext {
 describe('RdfCollectUtils (DONE)', () => {
     describe('RDF_COLLECT_UTILS', () => {
         it('... should reference all collect utils functions', () => {
-            expectToEqual(RDF_COLLECT_UTILS, { collectItems, collectParatexts, collectSources });
+            expectToEqual(RDF_COLLECT_UTILS, { collectItems, collectParatexts, collectSketches, collectSources });
         });
     });
 
@@ -148,6 +154,58 @@ describe('RdfCollectUtils (DONE)', () => {
                 const rules = ctx.warnings.map(warning => warning.rule).filter(rule => rule !== 'incompleteDate');
 
                 expectToEqual(rules, ['noComplex', 'placeholder', 'noComplex', 'placeholder', 'emptyItem']);
+            });
+        });
+
+        describe('#collectSketches()', () => {
+            let geneticsCtx: RdfGeneratorContext;
+
+            beforeEach(() => {
+                geneticsCtx = createContext(mockRdfGeneratorData.geneticsInput);
+                geneticsCtx.sources = collectSources(geneticsCtx);
+                geneticsCtx.items = collectItems(geneticsCtx);
+            });
+
+            it('... should have a method `collectSketches`', () => {
+                expect(collectSketches).toBeDefined();
+            });
+
+            it('... should return each sketch and row table once, with M number and sketch number', () => {
+                const sketches = [...collectSketches(geneticsCtx)].map(([local, { mnr, sketchNumber }]) => [
+                    local,
+                    mnr,
+                    sketchNumber,
+                ]);
+                const expectedSketches = [
+                    ['M317_Sk1', 'M317', '1'],
+                    ['M317_Sk2', 'M317', '2'],
+                    ['M317_Sk2_1', 'M317', '2.1'],
+                    ['M317_Sk2_1_1', 'M317', '2.1.1'],
+                    ['M317_Sk3', 'M317', '3'],
+                    ['M317_Sk5', 'M317', '5'],
+                    ['M317_Sk4_2_1', 'M317', '4.2.1'],
+                    ['M320_Sk1', 'M320', '1'],
+                    ['M320_Sk2', 'M320', '2'],
+                    ['M320_Sk1_1', 'M320', '1.1'],
+                    ['M321_Sk1', 'M321', '1'],
+                    ['Op25_SkRT', undefined, undefined],
+                ];
+
+                expectToEqual(sketches, expectedSketches);
+            });
+
+            it('... should return the segments of the svg partials and system links with their measures', () => {
+                const segments = [...collectSketches(geneticsCtx)]
+                    .filter(([, sketch]) => sketch.measuresBySegment.size)
+                    .map(([local, sketch]) => [local, Object.fromEntries(sketch.measuresBySegment)]);
+                const expectedSegments = [
+                    ['M317_Sk2', { a: ['1–2'], b: ['3–4', '5'], c: [] }],
+                    ['M320_Sk1', { a: ['1'], c: ['5'] }],
+                    ['M321_Sk1', { a: [] }],
+                    ['Op25_SkRT', { a: [], b: [] }],
+                ];
+
+                expectToEqual(segments, expectedSegments);
             });
         });
 

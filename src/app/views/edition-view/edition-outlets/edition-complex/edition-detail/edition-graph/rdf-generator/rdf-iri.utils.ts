@@ -1,4 +1,11 @@
 /**
+ * Regex constant: SEGMENT_LETTER_REGEX.
+ *
+ * It keeps a regex for the partial letter of a sketch segment (e.g. `a` in `M317_Sk4a`).
+ */
+const SEGMENT_LETTER_REGEX = /^[a-z]$/;
+
+/**
  * Utils function: slug.
  *
  * It converts a text into a safe local name of an IRI
@@ -90,6 +97,35 @@ export function placeholderSketchLocal(mnr: string, counter: number): string {
  */
 export function rowTableLocal(complex: string): string {
     return `${complex}_SkRT`;
+}
+
+/**
+ * Utils function: segmentLocal.
+ *
+ * It gets the local name of a sketch segment from its sketch and partial letter
+ * (e.g. `M317_Sk4`, `a` → `M317_Sk4a`; `Op24_SkRT`, `a` → `Op24_SkRTa`).
+ *
+ * @param {string} sketch The given local name of the sketch or row table.
+ * @param {string} letter The given partial letter.
+ * @returns {string} The local name.
+ */
+export function segmentLocal(sketch: string, letter: string): string {
+    return `${sketch}${letter}`;
+}
+
+/**
+ * Utils function: segmentLetter.
+ *
+ * It gets the partial letter if a local name is a segment of the sketch
+ * (e.g. `M317_Sk4`, `M317_Sk4a` → `a`; `M317_Sk4`, `M317_Sk4_1` → undefined).
+ *
+ * @param {string} sketch The given local name of the sketch or row table.
+ * @param {string} local The given local name.
+ * @returns {string | undefined} The partial letter, or undefined if the local name is no segment of the sketch.
+ */
+export function segmentLetter(sketch: string, local: string): string | undefined {
+    const letter = local.startsWith(sketch) ? local.slice(sketch.length) : '';
+    return SEGMENT_LETTER_REGEX.test(letter) ? letter : undefined;
 }
 
 /**
@@ -242,6 +278,8 @@ export const RDF_IRI_UTILS = {
     placementLocal,
     rowTableLocal,
     sectionLocal,
+    segmentLetter,
+    segmentLocal,
     seriesLocal,
     sheetLocal,
     sketchLocal,

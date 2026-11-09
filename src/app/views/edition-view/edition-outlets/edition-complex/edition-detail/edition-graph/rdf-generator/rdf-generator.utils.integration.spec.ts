@@ -36,6 +36,28 @@ const PARATEXTS_OUTSIDE_PHYSDESC = [
 ];
 
 /**
+ * Helper function: segmentLocals.
+ *
+ * It gets the local names of the segments of a sketch by their partial letters.
+ */
+function segmentLocals(sketch: string, letters: string): string[] {
+    return [...letters].map(letter => `${sketch}${letter}`);
+}
+
+/**
+ * Array constant: SEGMENTS_WITHOUT_PARTIALS.
+ *
+ * It keeps the curated segments of op. 25 whose sketches have neither svg partials
+ * nor system links in the data (no sketch sheets online).
+ */
+const SEGMENTS_WITHOUT_PARTIALS = [
+    segmentLocals('M321_Sk3', 'ab'),
+    segmentLocals('M321_Sk6', 'abcd'),
+    segmentLocals('M321_Sk8', 'abcdefghijk'),
+    segmentLocals('M322_Sk4', 'abcdefghij'),
+].flat();
+
+/**
  * Helper function: toNTriples.
  *
  * It serializes quads as N-Triples lines.
@@ -75,7 +97,7 @@ describe('RdfGeneratorUtils (integration with the op. 25 data) (DONE)', () => {
         expectToEqual(triples, snapshotOp25.triples);
     });
 
-    it('... should return all curated nodes except segments and paratexts outside the source descriptions', () => {
+    it('... should return all curated nodes except segments without partials and paratexts outside the source descriptions', () => {
         const curatedTurtle = getItemAt((graphDataOp25 as GraphList).graph, 0).rdfData.triples;
         const curatedSubjects = new Set(
             new Parser()
@@ -85,10 +107,8 @@ describe('RdfGeneratorUtils (integration with the op. 25 data) (DONE)', () => {
         );
         const generatedSubjects = new Set(quads.map(q => q.subject.value.replace(AWG, '')));
 
-        const missing = [...curatedSubjects].filter(local => !generatedSubjects.has(local));
-        const expectedMissing = missing.filter(
-            local => /_Sk\d+[a-z]$/.test(local) || PARATEXTS_OUTSIDE_PHYSDESC.includes(local)
-        );
+        const missing = [...curatedSubjects].filter(local => !generatedSubjects.has(local)).sort();
+        const expectedMissing = [...SEGMENTS_WITHOUT_PARTIALS, ...PARATEXTS_OUTSIDE_PHYSDESC].sort();
 
         expectToEqual(missing, expectedMissing);
     });

@@ -91,6 +91,16 @@ describe('RdfGeneratorUtils (DONE)', () => {
 
                 expectToEqual(sourceSubjects, []);
             });
+
+            it('... should return the complexes referenced only by the genetics facet', () => {
+                const geneticsOnly = generateComplexGraph({
+                    ...mockRdfGeneratorData.geneticsInput,
+                    facets: new Set(['genetics', 'edition']),
+                });
+                const segmentComplex = getRdfNode(geneticsOnly.quads, 'M321');
+
+                expectToEqual(segmentComplex['rdfs:label'], ['M 321']);
+            });
         });
 
         describe('#mergeGraphs()', () => {
