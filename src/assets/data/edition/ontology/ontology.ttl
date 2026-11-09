@@ -1,0 +1,613 @@
+@prefix awg: <https://edition.anton-webern.ch/webern-onto#> .
+@prefix crm: <http://www.cidoc-crm.org/cidoc-crm/> .
+@prefix crminf: <http://www.cidoc-crm.org/extensions/crminf/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix lrmoo: <http://iflastandards.info/ns/lrm/lrmoo/> .
+@prefix mo: <http://purl.org/ontology/mo/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix schema: <https://schema.org/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# =============================================================================
+# AWG-Ontologie (Entwurf)
+#
+# Modell des RDF-Graphen der Anton Webern Gesamtausgabe: Editionsebene,
+# Objekte und Editionen, Materialebene, genetische Relationen, Herkunft.
+#
+# Konventionen:
+# - Klassen `a owl:Class`, Properties `a owl:ObjectProperty` bzw.
+#   `owl:DatatypeProperty`; Klassen UpperCamelCase, Properties lowerCamelCase.
+# - Keine rdfs:domain/rdfs:range: erwartete Typen stehen nicht folgernd als
+#   schema:domainIncludes/schema:rangeIncludes (mehrere Angaben = Vereinigung).
+#   Prüfungen gehören ggf. in SHACL.
+# - Die App macht kein Reasoning. Properties stehen nur in der spezifischsten
+#   Form, ohne transitive Hülle. Typen: vorerst alle Obertypen als rdf:type
+#   materialisiert, weil der rdfstore-Fork Pfade mit + und * nur einen Schritt
+#   tief auswertet und | sowie ^ gar nicht kennt (geprüft 2026-11-09). Abfragen
+#   über Oberproperties daher per UNION mit
+#   `{ ?s awg:precedes ?o } UNION { ?p rdfs:subPropertyOf awg:precedes . ?s ?p ?o }`.
+# - Abgleich mit externen Standards nur als rdfs:seeAlso (Abschnitt ABGLEICH).
+#
+# OFFEN: Nach der Reparatur von rdfstore nur noch der spezifischste Typ; Abfragen
+#   dann mit Pfaden gegen diese (mitgeladene) Ontologie, z. B.
+#   `?s a/rdfs:subClassOf* awg:Sketch` oder `?a awg:precedes+ ?b`.
+# OFFEN: Personen (außer der Zuschreibung), Archive, Papiermarken,
+#   Schreibmittel und Annotationen sind nicht modelliert.
+# OFFEN: Die Beispielabfragen der graph.json brauchen Pfade
+#   (a/rdfs:subClassOf*, awg:belongsToComplex statt dcterms:isPartOf).
+# OFFEN: Ontologie und Instanzen teilen sich einen Namespace.
+# =============================================================================
+
+<https://edition.anton-webern.ch/webern-onto>
+    a owl:Ontology ;
+    rdfs:label "AWG-Ontologie"@de, "AWG ontology"@en ;
+    rdfs:comment "Modell des RDF-Graphen der Online-Edition der Anton Webern Gesamtausgabe."@de,
+        "Model of the RDF graph of the online edition of the Anton Webern Gesamtausgabe."@en ;
+    owl:versionInfo "0.1 (Entwurf)" ;
+    dcterms:created "2026-11-09"^^xsd:date .
+
+
+# =============================================================================
+# 1 Editionsebene
+# =============================================================================
+
+awg:CompleteEdition
+    a owl:Class ;
+    rdfs:label "Gesamtausgabe"@de, "complete edition"@en ;
+    rdfs:comment "Die historisch-kritische Gesamtausgabe als Ganzes (Instanz awg:AWG), gegliedert in Serien."@de,
+        "The historical-critical complete edition as a whole (instance awg:AWG), divided into series."@en .
+# OFFEN: Print- und Online-Edition nicht unterschieden.
+
+awg:Series
+    a owl:Class ;
+    rdfs:label "Serie"@de, "series"@en ;
+    rdfs:comment "Serie der Gesamtausgabe (z. B. Serie I); dcterms:isPartOf die Gesamtausgabe."@de,
+        "Series of the complete edition (e.g. series I); dcterms:isPartOf the complete edition."@en .
+
+awg:Section
+    a owl:Class ;
+    rdfs:label "Abteilung"@de, "section"@en ;
+    rdfs:comment "Abteilung einer Serie (z. B. I/5 Klavierlieder, II/2a); dcterms:isPartOf die Serie."@de,
+        "Section of a series (e.g. I/5 piano songs, II/2a); dcterms:isPartOf the series."@en .
+
+awg:EditionComplex
+    a owl:Class ;
+    rdfs:label "Editionskomplex"@de, "edition complex"@en ;
+    rdfs:comment "Gruppe von Textfassungen und Skizzen, die gemeinsam ediert werden, benannt nach Opuszahl oder M-Nummer (Vorwort); dcterms:isPartOf eine Abteilung. Trägt Katalogtyp und -nummer selbst; eigene Knoten für M-Nummern oder Opuszahlen gibt es nicht."@de,
+        "Group of versions and sketches edited together, named by opus or M number (preface); dcterms:isPartOf a section. Carries its catalogue type and number itself; there are no separate nodes for M numbers or opus numbers."@en .
+# Ein Komplex kann zwei Moldenhauer-Nummern zusammenführen, die editorisch als
+#   zusammengehörig erkannt wurden (m35_42: ein Komplex, catalogueNumber „35/42“);
+#   die Nummer verweist nur auf die beiden Vorgänger, M 35 und M 42 sind nicht
+#   einzeln erfasst.
+# OFFEN: M-Nummern ohne eigenen Komplex (88 Studien; M 316 = op. 24/1, kuratiert
+#   heute awg:Op24_1, künftig an awg:Op24). Eigene Knoten erst mit einer M-Nummern-Registry.
+# OFFEN: Pseudo-Komplexe (frühere Stadien mit obsoleten Opuszahlen) und ihre
+#   Relation zum späteren Komplex.
+
+awg:CompositeEditionComplex
+    a owl:Class ;
+    rdfs:subClassOf awg:EditionComplex ;
+    rdfs:label "Sammelkomplex"@de, "composite complex"@en ;
+    rdfs:comment "Editionskomplex eines Opus mit M-Nummern als Teilen (z. B. op. 25: M 317, M 322, M 321); Teile per dcterms:hasPart, Reihenfolge über awg:ComplexPart."@de,
+        "Edition complex of an opus with M numbers as parts (e.g. op. 25: M 317, M 322, M 321); parts via dcterms:hasPart, order via awg:ComplexPart."@en .
+
+awg:ComplexPart
+    a owl:Class ;
+    rdfs:label "Teil eines Sammelkomplexes"@de, "part of a composite complex"@en ;
+    rdfs:comment "Stelle eines Teils in einem Sammelkomplex (z. B. awg:Op25_part_2 = M 322 als II); erlaubt verschiedene Positionen derselben M-Nummer in mehreren Sammelkomplexen."@de,
+        "Position of a part within a composite complex (e.g. awg:Op25_part_2 = M 322 as no. II); allows different positions of the same M number in several composite complexes."@en .
+
+awg:belongsToComplex
+    a owl:ObjectProperty ;
+    rdfs:subPropertyOf dcterms:isPartOf ;
+    rdfs:label "gehört zu Komplex"@de, "belongs to complex"@en ;
+    rdfs:comment "Inhaltliche Zuordnung zu einem Editionskomplex, unabhängig von der Lage auf dem Blatt (z. B. eine Akkolade auf SB3 zu op. 24); mehrfach erlaubt."@de,
+        "Assignment by content to an edition complex, independent of the position on the page (e.g. a brace in SB3 to op. 24); may be repeated."@en ;
+    schema:domainIncludes awg:Inscription, awg:TextVersion, awg:Source ;
+    schema:rangeIncludes awg:EditionComplex .
+
+awg:partOfComplex
+    a owl:ObjectProperty ;
+    rdfs:label "Teil in"@de, "part in"@en ;
+    rdfs:comment "Der Sammelkomplex, in dem diese Stelle liegt."@de,
+        "The composite complex this position belongs to."@en ;
+    schema:domainIncludes awg:ComplexPart ;
+    schema:rangeIncludes awg:CompositeEditionComplex .
+
+awg:partComplex
+    a owl:ObjectProperty ;
+    rdfs:label "Teilkomplex"@de, "part complex"@en ;
+    rdfs:comment "Der Editionskomplex (M-Nummer), der an dieser Stelle steht."@de,
+        "The edition complex (M number) at this position."@en ;
+    schema:domainIncludes awg:ComplexPart ;
+    schema:rangeIncludes awg:EditionComplex .
+
+awg:partNumber
+    a owl:DatatypeProperty ;
+    rdfs:label "Teilnummer"@de, "part number"@en ;
+    rdfs:comment "Position des Teils im Sammelkomplex (1, 2, 3 …); folgt der Reihenfolge des Opus, nicht der M-Nummern."@de,
+        "Position of the part within the composite complex (1, 2, 3 …); follows the order of the opus, not of the M numbers."@en ;
+    schema:domainIncludes awg:ComplexPart ;
+    schema:rangeIncludes xsd:integer .
+
+awg:workEditionTextVersion
+    a owl:ObjectProperty ;
+    rdfs:label "Textfassung der Werkedition"@de, "version of the work edition"@en ;
+    rdfs:comment "Die Textfassung, die für diesen Teil als Werkedition ediert ist (z. B. M 317: Textfassung 2)."@de,
+        "The version edited as the work edition of this part (e.g. M 317: version 2)."@en ;
+    schema:domainIncludes awg:ComplexPart ;
+    schema:rangeIncludes awg:TextVersion .
+
+awg:catalogueType
+    a owl:ObjectProperty ;
+    rdfs:label "Katalogtyp"@de, "catalogue type"@en ;
+    rdfs:comment "Art der Nummer, nach der ein Komplex benannt ist (Opus, M-Nummer, M*-Nummer)."@de,
+        "Kind of number a complex is named by (opus, M number, M* number)."@en ;
+    schema:domainIncludes awg:EditionComplex ;
+    schema:rangeIncludes skos:Concept .
+
+awg:catalogueNumber
+    a owl:DatatypeProperty ;
+    rdfs:label "Katalognummer"@de, "catalogue number"@en ;
+    rdfs:comment "Nummer im jeweiligen Katalog, wie in den Daten (z. B. \"25\", \"317\", \"35/42\")."@de,
+        "Number within the catalogue, as in the data (e.g. \"25\", \"317\", \"35/42\")."@en ;
+    schema:domainIncludes awg:EditionComplex ;
+    schema:rangeIncludes xsd:string .
+
+awg:CatalogueTypeScheme
+    a skos:ConceptScheme ;
+    rdfs:label "Katalogtypen"@de, "catalogue types"@en .
+
+awg:catalogueType_OPUS
+    a skos:Concept ;
+    skos:inScheme awg:CatalogueTypeScheme ;
+    skos:prefLabel "Opus"@de, "opus"@en ;
+    skos:notation "OPUS" .
+
+awg:catalogueType_MNR
+    a skos:Concept ;
+    skos:inScheme awg:CatalogueTypeScheme ;
+    skos:prefLabel "M-Nummer"@de, "M number"@en ;
+    skos:definition "Nummer im Katalog von Hans Moldenhauer (1978)."@de,
+        "Number in the catalogue by Hans Moldenhauer (1978)."@en ;
+    skos:notation "MNR" .
+
+awg:catalogueType_MNR_X
+    a skos:Concept ;
+    skos:inScheme awg:CatalogueTypeScheme ;
+    skos:prefLabel "M*-Nummer"@de, "M* number"@en ;
+    skos:notation "MNR_X" .
+
+
+# =============================================================================
+# 2 Objekte und Editionen
+# =============================================================================
+
+awg:Inscription
+    a owl:Class ;
+    rdfs:label "Niederschrift"@de, "inscription"@en ;
+    rdfs:comment "Alles, was auf einem Dokument niedergeschrieben ist und in eine Entstehungsfolge gestellt wird: Skizzen und Paratexte."@de,
+        "Anything written down on a document and placed in a sequence of genesis: sketches and paratexts."@en .
+
+awg:Sketch
+    a owl:Class ;
+    rdfs:subClassOf awg:Inscription ;
+    rdfs:label "Skizze"@de, "sketch"@en ;
+    rdfs:comment "Skizze als Objekt auf dem Dokument, unabhängig davon, ob eine Skizzenedition (Sheet) existiert (z. B. awg:M317_Sk1). Träger der genetischen Relationen."@de,
+        "Sketch as an object on the document, whether or not a sketch edition (sheet) exists (e.g. awg:M317_Sk1). Carrier of the genetic relations."@en .
+# OFFEN: Platzhalter Sk##/Sk### bekommen IRIs mit Zähler je Quelle (z. B. awg:M78_SkX_1); nicht stabil.
+
+awg:SketchSegment
+    a owl:Class ;
+    rdfs:subClassOf awg:Sketch ;
+    rdfs:label "Skizzensegment"@de, "sketch segment"@en ;
+    rdfs:comment "Abschnitt einer Skizze nach Takten (z. B. awg:M317_Sk4a, T. 1A–3A); dcterms:isPartOf die Skizze, Taktfolge der Segmente per awg:nextSegment. Entspricht den Partials eines Skizzen-Sheets; die Partials von Text-Sheets sind Seiten und keine Segmente."@de,
+        "Section of a sketch by measures (e.g. awg:M317_Sk4a, mm. 1A–3A); dcterms:isPartOf the sketch, measure order of the segments via awg:nextSegment. Corresponds to the partials of a sketch sheet; partials of text sheets are pages, not segments."@en .
+
+awg:nextSegment
+    a owl:ObjectProperty ;
+    rdfs:label "nächstes Segment"@de, "next segment"@en ;
+    rdfs:comment "Folgendes Segment derselben Skizze in Taktfolge; nicht genetisch und nicht transitiv. Eine Entstehungsfolge zwischen Segmenten steht nur explizit per awg:precedes."@de,
+        "Following segment of the same sketch in measure order; not genetic and not transitive. An order of genesis between segments is only stated explicitly via awg:precedes."@en ;
+    schema:domainIncludes awg:SketchSegment ;
+    schema:rangeIncludes awg:SketchSegment .
+
+awg:RowTable
+    a owl:Class ;
+    rdfs:subClassOf awg:Sketch ;
+    rdfs:label "Reihentabelle"@de, "row table"@en ;
+    rdfs:comment "Skizze mit den Formen einer Zwölftonreihe (z. B. awg:Op25_SkRT); gehört meist zum Opus, nicht zu einer M-Nummer."@de,
+        "Sketch listing the forms of a twelve-tone row (e.g. awg:Op25_SkRT); usually belongs to the opus, not to an M number."@en .
+
+awg:ContinuityDraft
+    a owl:Class ;
+    rdfs:subClassOf awg:Sketch ;
+    rdfs:label "Verlaufsskizze"@de, "continuity draft"@en ;
+    rdfs:comment "Skizze, die den Verlauf eines Stücks über längere Strecken festhält (z. B. M 317 Sk4); nur kuratiert, nicht aus den Daten ableitbar."@de,
+        "Sketch recording the course of a piece over longer stretches (e.g. M 317 Sk4); curated only, not derivable from the data."@en .
+
+awg:Paratext
+    a owl:Class ;
+    rdfs:subClassOf awg:Inscription ;
+    rdfs:label "Paratext"@de, "paratext"@en ;
+    rdfs:comment "Nicht-musikalische Niederschrift auf einem Dokument (Titel, Datierung, Paginierung …); Art über awg:paratextType."@de,
+        "Non-musical inscription on a document (title, dating, pagination …); kind via awg:paratextType."@en .
+# OFFEN: Akkoladenstrich und Schlüssel-/Taktvorzeichnung (kuratiert als Paratext) –
+#   Paratext oder Notation?
+# OFFEN: Generierte Paratexte aus physDesc vs. kuratierte Nummerierung (_PT<n>).
+
+awg:paratextType
+    a owl:ObjectProperty ;
+    rdfs:label "Paratextart"@de, "paratext type"@en ;
+    rdfs:comment "Art eines Paratexts (Konzept aus awg:ParatextTypeScheme)."@de,
+        "Kind of a paratext (concept from awg:ParatextTypeScheme)."@en ;
+    schema:domainIncludes awg:Paratext ;
+    schema:rangeIncludes skos:Concept .
+
+awg:statedDate
+    a owl:DatatypeProperty ;
+    rdfs:label "genanntes Datum"@de, "stated date"@en ;
+    rdfs:comment "Datum, das eine Datierung nennt (z. B. „16. VII. 34“ → 1934-07-16); nicht das Entstehungsdatum einer Skizze. Der Wortlaut bleibt im Label."@de,
+        "Date stated by a dating (e.g. „16. VII. 34“ → 1934-07-16); not the date of origin of a sketch. The wording stays in the label."@en ;
+    schema:domainIncludes awg:Paratext ;
+    schema:rangeIncludes xsd:date .
+# OFFEN: Ortsangaben („Maria Enzersdorf“), Ereignisse und unvollständige Daten
+#   (ohne Jahr, z. B. „M. am 30. IX. nach Zürich abgereist.“).
+
+awg:ParatextTypeScheme
+    a skos:ConceptScheme ;
+    rdfs:label "Paratextarten"@de, "paratext types"@en ;
+    rdfs:comment "Startkonzepte nach den Kategorien der Quellenbeschreibungen (physDesc)."@de,
+        "Initial concepts following the categories of the source descriptions (physDesc)."@en .
+
+awg:paratextType_title
+    a skos:Concept ;
+    skos:inScheme awg:ParatextTypeScheme ;
+    skos:prefLabel "Titel"@de, "title"@en .
+
+awg:paratextType_dating
+    a skos:Concept ;
+    skos:inScheme awg:ParatextTypeScheme ;
+    skos:prefLabel "Datierung"@de, "dating"@en .
+
+awg:paratextType_pagination
+    a skos:Concept ;
+    skos:inScheme awg:ParatextTypeScheme ;
+    skos:prefLabel "Paginierung"@de, "pagination"@en .
+
+awg:paratextType_instrumentation
+    a skos:Concept ;
+    skos:inScheme awg:ParatextTypeScheme ;
+    skos:prefLabel "Besetzungsangabe"@de, "instrumentation"@en .
+
+awg:paratextType_measureNumbering
+    a skos:Concept ;
+    skos:inScheme awg:ParatextTypeScheme ;
+    skos:prefLabel "Taktzählung"@de, "measure numbering"@en .
+
+awg:paratextType_annotation
+    a skos:Concept ;
+    skos:inScheme awg:ParatextTypeScheme ;
+    skos:prefLabel "Anmerkung"@de, "annotation"@en .
+
+awg:TextVersion
+    a owl:Class ;
+    rdfs:label "Textfassung"@de, "version"@en ;
+    rdfs:comment "Erkennbare Fassung einer M-Nummer (z. B. awg:M317_TF2), abstrakt, nicht das edierte Sheet; „einzige Textfassung“ ist TF1. Wird von Quellen überliefert und von Text- oder Werkeditionen ediert."@de,
+        "Recognizable version of an M number (e.g. awg:M317_TF2), abstract, not the edited sheet; the „only version“ is TF1. Transmitted by sources and edited by text or work editions."@en .
+# OFFEN: Textfassungen in genetischen Relationen (z. B. TF1 precedes TF2).
+
+awg:transmittedBy
+    a owl:ObjectProperty ;
+    rdfs:label "überliefert in"@de, "transmitted by"@en ;
+    rdfs:comment "Quelle, die eine Textfassung überliefert; bei Revisionen in einer Quelle („Textfassung 1→2“) überliefert dieselbe Quelle beide Fassungen."@de,
+        "Source transmitting a version; for revisions within one source („version 1→2“) the same source transmits both versions."@en ;
+    schema:domainIncludes awg:TextVersion ;
+    schema:rangeIncludes awg:Source .
+
+awg:EditedMusicText
+    a owl:Class ;
+    rdfs:label "edierter Notentext"@de, "edited musical text"@en ;
+    rdfs:comment "Von der Edition hergestellter Notentext (in der App ein Sheet); Oberklasse der drei Editionsformen."@de,
+        "Musical text produced by the edition (a sheet in the app); superclass of the three edition forms."@en .
+
+awg:SketchEdition
+    a owl:Class ;
+    rdfs:subClassOf awg:EditedMusicText ;
+    rdfs:label "Skizzenedition"@de, "sketch edition"@en ;
+    rdfs:comment "Eine der drei Editionsformen (Vorwort): diplomatische Transkription einer Skizze (z. B. awg:M317_Sk1_Sheet); nur, wenn ein Sheet existiert. Die Partials eines Skizzen-Sheets sind eigene Skizzeneditionen der Segmente (dcterms:isPartOf das Sheet)."@de,
+        "One of the three edition forms (preface): diplomatic transcription of a sketch (e.g. awg:M317_Sk1_Sheet); only when a sheet exists. The partials of a sketch sheet are sketch editions of the segments in their own right (dcterms:isPartOf the sheet)."@en .
+
+awg:TextEdition
+    a owl:Class ;
+    rdfs:subClassOf awg:EditedMusicText ;
+    rdfs:label "Textedition"@de, "text edition"@en ;
+    rdfs:comment "Eine der drei Editionsformen (Vorwort): Notentext einer bestimmten, möglicherweise fragmentarischen Textfassung (z. B. awg:M317_TF1_Sheet)."@de,
+        "One of the three edition forms (preface): musical text of a specific, possibly fragmentary version (e.g. awg:M317_TF1_Sheet)."@en .
+
+awg:WorkEdition
+    a owl:Class ;
+    rdfs:subClassOf awg:EditedMusicText ;
+    rdfs:label "Werkedition"@de, "work edition"@en ;
+    rdfs:comment "Eine der drei Editionsformen (Vorwort): vollständiger, eindeutiger Notentext einer zu Lebzeiten gedruckten oder zum Druck vorgesehenen Textfassung. Online derzeit ohne Sheets (Schutzfrist)."@de,
+        "One of the three edition forms (preface): complete, unambiguous musical text of a version printed or intended for print during Webern's lifetime. Currently without sheets online (protection period)."@en .
+
+awg:edits
+    a owl:ObjectProperty ;
+    rdfs:label "ediert"@de, "edits"@en ;
+    rdfs:comment "Verbindet einen edierten Notentext mit dem, was er ediert: Skizzenedition → Skizze, Text-/Werkedition → Textfassung."@de,
+        "Links an edited musical text with what it edits: sketch edition → sketch, text/work edition → version."@en ;
+    schema:domainIncludes awg:EditedMusicText ;
+    schema:rangeIncludes awg:Sketch, awg:TextVersion .
+# OFFEN: Link vom Sheet-Knoten zur App-Seite (z. B. schema:url).
+
+
+# =============================================================================
+# 3 Materialebene
+# =============================================================================
+
+awg:Document
+    a owl:Class ;
+    rdfs:label "Dokument"@de, "document"@en ;
+    rdfs:comment "Physisches Dokument, komplexübergreifend geteilt, IRI aus der awg_doc_-ID der Registry documents.json (z. B. awg:awg_doc_0047). Teile eines Konvoluts dcterms:isPartOf das Konvolut-Dokument."@de,
+        "Physical document, shared across complexes, IRI from the awg_doc_ id of the registry documents.json (e.g. awg:awg_doc_0047). Parts of a convolute dcterms:isPartOf the convolute document."@en .
+# OFFEN: Skizzenbuch als Ganzes (gewünscht); heute erfasst die Registry Ausschnitte
+#   (SB3: awg_doc_0043 für op. 23, awg_doc_0047 für op. 25). Keine Behälter-Klassen.
+# OFFEN: Standort, Verlust (missing), Drucke (publication).
+
+awg:Source
+    a owl:Class ;
+    rdfs:label "Quelle"@de, "source"@en ;
+    rdfs:comment "Komplexlokale Sicht auf ein Dokument mit Siglum und Quellentyp (z. B. awg:Op25_source_A); dasselbe Dokument kann in mehreren Komplexen unter verschiedenen Sigla Quelle sein."@de,
+        "Complex-local view of a document with siglum and source type (e.g. awg:Op25_source_A); the same document may be a source in several complexes under different sigla."@en .
+
+awg:hasDocument
+    a owl:ObjectProperty ;
+    rdfs:label "hat Dokument"@de, "has document"@en ;
+    rdfs:comment "Das physische Dokument hinter einer Quelle."@de,
+        "The physical document behind a source."@en ;
+    schema:domainIncludes awg:Source ;
+    schema:rangeIncludes awg:Document .
+
+awg:siglum
+    a owl:DatatypeProperty ;
+    rdfs:label "Siglum"@de, "siglum"@en ;
+    rdfs:comment "Siglum der Quelle im Komplex (z. B. \"A\")."@de,
+        "Siglum of the source within the complex (e.g. \"A\")."@en ;
+    schema:domainIncludes awg:Source ;
+    schema:rangeIncludes xsd:string .
+
+awg:siglumAddendum
+    a owl:DatatypeProperty ;
+    rdfs:label "Siglenzusatz"@de, "siglum addendum"@en ;
+    rdfs:comment "Zusatz zum Siglum (z. B. \"H\", \"F1–F2\"); eine Quelle mit Zusatz ist ein eigenes Dokument."@de,
+        "Addendum to the siglum (e.g. \"H\", \"F1–F2\"); a source with an addendum is a document of its own."@en ;
+    schema:domainIncludes awg:Source ;
+    schema:rangeIncludes xsd:string .
+
+awg:sourceType
+    a owl:DatatypeProperty ;
+    rdfs:label "Quellentyp"@de, "source type"@en ;
+    rdfs:comment "Beschreibung der Quelle aus Sicht des Komplexes (z. B. „Reihentabelle.“ oder „Autograph von … M 317: Textfassung 1.“)."@de,
+        "Description of the source from the complex's point of view (e.g. „Reihentabelle.“ or „Autograph von … M 317: Textfassung 1.“)."@en ;
+    schema:domainIncludes awg:Source ;
+    schema:rangeIncludes xsd:string .
+
+awg:Folio
+    a owl:Class ;
+    rdfs:label "Blattseite"@de, "folio (side)"@en ;
+    rdfs:comment "Seite eines Blatts, wie Daten und App das Folio verstehen (z. B. awg:awg_doc_0047_38v, „Bl. 38v“); dcterms:isPartOf das Dokument."@de,
+        "Side of a leaf, as the data and the app use folio (e.g. awg:awg_doc_0047_38v, „Bl. 38v“); dcterms:isPartOf the document."@en .
+# OFFEN: das Blatt als eigene Klasse (awg:Leaf); awg:Folio bleibt die Seite.
+
+awg:systemCount
+    a owl:DatatypeProperty ;
+    rdfs:label "Anzahl Systeme"@de, "number of staves"@en ;
+    rdfs:comment "Anzahl der rastrierten Systeme der Blattseite."@de,
+        "Number of ruled staves on the folio."@en ;
+    schema:domainIncludes awg:Folio ;
+    schema:rangeIncludes xsd:integer .
+
+awg:height
+    a owl:DatatypeProperty ;
+    rdfs:label "Höhe (mm)"@de, "height (mm)"@en ;
+    rdfs:comment "Höhe der Blattseite in Millimetern."@de,
+        "Height of the folio in millimetres."@en ;
+    schema:domainIncludes awg:Folio ;
+    schema:rangeIncludes xsd:decimal .
+
+awg:width
+    a owl:DatatypeProperty ;
+    rdfs:label "Breite (mm)"@de, "width (mm)"@en ;
+    rdfs:comment "Breite der Blattseite in Millimetern."@de,
+        "Width of the folio in millimetres."@en ;
+    schema:domainIncludes awg:Folio ;
+    schema:rangeIncludes xsd:decimal .
+
+awg:writtenOn
+    a owl:ObjectProperty ;
+    rdfs:label "notiert auf"@de, "written on"@en ;
+    rdfs:comment "Blattseite, auf der eine Niederschrift (ganz oder teilweise) steht; direkte Kante für den Graph, Details im awg:Placement."@de,
+        "Folio on which an inscription is (wholly or partly) written; direct edge for the graph, details in awg:Placement."@en ;
+    schema:domainIncludes awg:Inscription ;
+    schema:rangeIncludes awg:Folio .
+
+awg:Placement
+    a owl:Class ;
+    rdfs:label "Lage"@de, "placement"@en ;
+    rdfs:comment "Lage einer Niederschrift auf einer Blattseite: Systeme und Takte (z. B. awg:M317_Sk1_place_awg_doc_0047_38v); je Blattseite ein Knoten."@de,
+        "Placement of an inscription on a folio: staves and measures (e.g. awg:M317_Sk1_place_awg_doc_0047_38v); one node per folio."@en .
+
+awg:placementOf
+    a owl:ObjectProperty ;
+    rdfs:label "Lage von"@de, "placement of"@en ;
+    rdfs:comment "Die Niederschrift, deren Lage beschrieben wird."@de,
+        "The inscription whose placement is described."@en ;
+    schema:domainIncludes awg:Placement ;
+    schema:rangeIncludes awg:Inscription .
+
+awg:onFolio
+    a owl:ObjectProperty ;
+    rdfs:label "auf Blattseite"@de, "on folio"@en ;
+    rdfs:comment "Die Blattseite dieser Lage."@de,
+        "The folio of this placement."@en ;
+    schema:domainIncludes awg:Placement ;
+    schema:rangeIncludes awg:Folio .
+
+awg:systems
+    a owl:DatatypeProperty ;
+    rdfs:label "Systeme"@de, "staves"@en ;
+    rdfs:comment "Systemangabe wie in der Quellenbeschreibung (z. B. \"1c–3c\"; Buchstaben = Abschnitte innerhalb eines Systems)."@de,
+        "Staff reference as in the source description (e.g. \"1c–3c\"; letters = sections within a staff)."@en ;
+    schema:domainIncludes awg:Placement ;
+    schema:rangeIncludes xsd:string .
+
+awg:measures
+    a owl:DatatypeProperty ;
+    rdfs:label "Takte"@de, "measures"@en ;
+    rdfs:comment "Taktangabe wie in der Quellenbeschreibung (z. B. \"{1A}, {1B}, 1–2, 3A\")."@de,
+        "Measure reference as in the source description (e.g. \"{1A}, {1B}, 1–2, 3A\")."@en ;
+    schema:domainIncludes awg:Placement, awg:SketchSegment ;
+    schema:rangeIncludes xsd:string .
+
+
+# =============================================================================
+# 4 Genetische Relationen
+# =============================================================================
+
+awg:precedes
+    a owl:ObjectProperty, owl:TransitiveProperty ;
+    rdfs:label "geht voraus"@de, "precedes"@en ;
+    rdfs:comment "A geht B in der Entstehung voraus: A wurde vor B begonnen, Überlappung ist möglich. Ohne Unterproperty ist die Begründung nicht angegeben; dazu gehört die Nummerierung (Sk1 vor Sk2)."@de,
+        "A precedes B in the genesis: A was begun before B, overlap is possible. Without a subproperty the reason is unspecified; this includes the numbering (Sk1 before Sk2)."@en ;
+    schema:domainIncludes awg:Inscription ;
+    schema:rangeIncludes awg:Inscription .
+
+awg:precedesScripture
+    a owl:ObjectProperty ;
+    rdfs:subPropertyOf awg:precedes ;
+    rdfs:label "geht nach Schreibbefund voraus"@de, "precedes by scriptural evidence"@en ;
+    rdfs:comment "Reihenfolge aus dem Schreibbefund: Lage auf dem Blatt, Überlagerung, Schreibmittel, Korrekturschichten."@de,
+        "Order derived from the scriptural evidence: position on the page, overlapping, writing instruments, correction layers."@en ;
+    schema:domainIncludes awg:Inscription ;
+    schema:rangeIncludes awg:Inscription .
+
+awg:precedesContent
+    a owl:ObjectProperty ;
+    rdfs:subPropertyOf awg:precedes ;
+    rdfs:label "geht inhaltlich voraus"@de, "precedes by content"@en ;
+    rdfs:comment "Reihenfolge aus dem musikalischen Inhalt: die spätere Niederschrift übernimmt Änderungen der früheren."@de,
+        "Order derived from the musical content: the later inscription takes up changes of the earlier one."@en ;
+    schema:domainIncludes awg:Inscription ;
+    schema:rangeIncludes awg:Inscription .
+
+awg:concomitates
+    a owl:ObjectProperty, owl:SymmetricProperty ;
+    rdfs:label "begleitet"@de, "concomitates"@en ;
+    rdfs:comment "Niederschriften, die nebeneinander und gleichzeitig entstanden sind und sich gegenseitig beeinflussen, ohne dass eine Reihenfolge erkennbar ist. Symmetrisch, nicht transitiv; gespeichert wird nur eine Richtung (abhängige → Hauptniederschrift), die als Konvention keine eigene Bedeutung trägt. Abfragen prüfen beide Richtungen."@de,
+        "Inscriptions written side by side at the same time, influencing each other, without an identifiable order. Symmetric, not transitive; only one direction is stored (dependent → main inscription), a convention without meaning of its own. Queries check both directions."@en ;
+    schema:domainIncludes awg:Inscription ;
+    schema:rangeIncludes awg:Inscription .
+# OFFEN: Ob die Nummerierung „.n“ (Sk6.3) immer Konkomitanz bedeutet.
+# OFFEN: Konkomitanz auf Segmentebene (linkBoxes, heute untypisiert).
+
+
+# =============================================================================
+# 5 Herkunft und Unsicherheit
+# =============================================================================
+
+awg:EditorialStatement
+    a owl:Class ;
+    rdfs:subClassOf rdf:Statement ;
+    rdfs:label "editorische Aussage"@de, "editorial statement"@en ;
+    rdfs:comment "Reifizierte kuratierte Kante (rdf:subject, rdf:predicate, rdf:object) mit Zuschreibung (prov:wasAttributedTo), optional Sicherheit und Begründung (z. B. awg:stmt_M317_Sk1_precedes_M317_Sk2). Die Kante steht zusätzlich als einfaches Tripel im Graph."@de,
+        "Reified curated edge (rdf:subject, rdf:predicate, rdf:object) with attribution (prov:wasAttributedTo), optionally certainty and justification (e.g. awg:stmt_M317_Sk1_precedes_M317_Sk2). The edge is also asserted as a plain triple."@en .
+# OFFEN: Nach dem Vortrag Herkunft je Schicht über Named Graphs (kuratiert/generiert);
+#   Aussage-Knoten dann nur noch für Unsicherheit, Begründung oder abweichende Zuschreibung.
+# Zuschreibung: Personen als minimale Knoten `a prov:Agent, foaf:Person` mit foaf:name
+#   (z. B. awg:person_thomas_ahrend aus respStatement.editors).
+
+awg:certainty
+    a owl:ObjectProperty ;
+    rdfs:label "Sicherheit"@de, "certainty"@en ;
+    rdfs:comment "Sicherheit einer editorischen Aussage (Konzept aus awg:CertaintyScheme); ohne Angabe gilt die Aussage als sicher."@de,
+        "Certainty of an editorial statement (concept from awg:CertaintyScheme); without a value the statement counts as certain."@en ;
+    schema:domainIncludes awg:EditorialStatement ;
+    schema:rangeIncludes skos:Concept .
+
+awg:justification
+    a owl:DatatypeProperty ;
+    rdfs:label "Begründung"@de, "justification"@en ;
+    rdfs:comment "Optionale Begründung einer editorischen Aussage als Text."@de,
+        "Optional justification of an editorial statement as text."@en ;
+    schema:domainIncludes awg:EditorialStatement ;
+    schema:rangeIncludes rdf:langString .
+
+awg:CertaintyScheme
+    a skos:ConceptScheme ;
+    rdfs:label "Sicherheitsgrade"@de, "degrees of certainty"@en .
+
+awg:certainty_uncertain
+    a skos:Concept ;
+    skos:inScheme awg:CertaintyScheme ;
+    skos:prefLabel "unsicher"@de, "uncertain"@en ;
+    skos:definition "Die Relation ist möglich, aber nicht gesichert (ersetzt concomitates_unsure)."@de,
+        "The relation is possible but not established (replaces concomitates_unsure)."@en .
+# OFFEN: weitere Sicherheitsgrade (z. B. vermutet).
+
+
+# =============================================================================
+# ABGLEICH mit externen Standards
+#
+# Nur rdfs:seeAlso: Annäherungen ohne Folgerung; das AWG-Modell bleibt eigenständig.
+# Geprüft am 2026-11-09 an den Originalquellen:
+# - LRMoo 1.1.1 (November 2025), http://iflastandards.info/ns/lrm/lrmoo/;
+#   FRBRoo ist überholt. F4 Manifestation Singleton und F15 Complex Work
+#   (Paper Münnich/Ahrend 2021) gibt es in LRMoo nicht mehr.
+# - CIDOC CRM 7.1.3 (Februar 2024, stabil), http://www.cidoc-crm.org/cidoc-crm/;
+#   P120 „occurs before“ gibt es nicht mehr; zeitliche Primitive P173–P176,
+#   P182–P185 gelten zwischen E2 Temporal Entity (z. B. Entstehungsereignissen).
+# - CRMinf 1.2.1 (April 2026), http://www.cidoc-crm.org/extensions/crminf/;
+#   I6 Belief Value ohne IRI.
+# - Music Ontology 2.1.5 (2013), http://purl.org/ontology/mo/; mo:MusicalWork
+#   baut auf dem alten frbr:Work auf und wird deshalb nicht verwendet.
+# - PROV-O (2013), SKOS (2009), DCMI Terms (2020), schema.org 30.1 (https).
+# Wörtlich gelesen: lrmoo:F1_Work, F2_Expression, F5_Item, F28_Expression_Creation,
+#   crminf:I1_Argumentation, I2_Belief, crm:P174_starts_before_the_end_of.
+# OFFEN: crm:E31_Document, crm:E22_Human-Made_Object und
+#   crm:P176_starts_before_the_start_of nach der CRM-Namensregel abgeleitet,
+#   Deklaration nicht wörtlich gelesen; mo: nur gegen die RDF-Datei im
+#   GitHub-Repository (motools/musicontology) geprüft, nicht gegen die Spezifikation.
+# =============================================================================
+
+awg:CompleteEdition rdfs:seeAlso schema:CreativeWorkSeries .
+awg:Series rdfs:seeAlso schema:CreativeWorkSeries .
+awg:Section rdfs:seeAlso schema:CreativeWorkSeries .
+
+# Der Komplex dokumentiert eine abstrakte Einheit (Paper 2021: F15/F14 in FRBRoo).
+awg:EditionComplex rdfs:seeAlso lrmoo:F1_Work, schema:MusicComposition .
+
+# Inhalt einer Fassung bzw. Skizze; die AWG-Skizze ist zugleich Objekt auf dem Dokument.
+awg:TextVersion rdfs:seeAlso lrmoo:F2_Expression .
+awg:Sketch rdfs:seeAlso lrmoo:F2_Expression .
+
+# Editor-Text (Paper 2021: E31 Document), Notentext als Partitur.
+awg:EditedMusicText rdfs:seeAlso crm:E31_Document, mo:Score .
+
+# Unikales physisches Exemplar (ersetzt F4 Manifestation Singleton).
+awg:Document rdfs:seeAlso lrmoo:F5_Item, crm:E22_Human-Made_Object, schema:ArchiveComponent .
+
+# Argumentationsmodell: künftiger Anschluss für Begründung und Unsicherheit
+# (I2 Belief mit J4 that → I4 Proposition Set, J5 holds to be → I6 Belief Value).
+awg:EditorialStatement rdfs:seeAlso crminf:I2_Belief, crminf:I1_Argumentation .
+
+# Zeitlich gelesen zwischen den Entstehungsereignissen (lrmoo:F28_Expression_Creation):
+# precedes ≈ Entstehung(A) P176 starts before the start of Entstehung(B);
+# concomitates ≈ P174 starts before the end of, in beide Richtungen (Überlappung).
+awg:precedes rdfs:seeAlso crm:P176_starts_before_the_start_of, lrmoo:F28_Expression_Creation .
+awg:concomitates rdfs:seeAlso crm:P174_starts_before_the_end_of, lrmoo:F28_Expression_Creation .
