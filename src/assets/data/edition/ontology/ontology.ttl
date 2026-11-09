@@ -199,7 +199,8 @@ awg:Sketch
     rdfs:label "Skizze"@de, "sketch"@en ;
     rdfs:comment "Skizze als Objekt auf dem Dokument, unabhängig davon, ob eine Skizzenedition (Sheet) existiert (z. B. awg:M317_Sk1). Träger der genetischen Relationen."@de,
         "Sketch as an object on the document, whether or not a sketch edition (sheet) exists (e.g. awg:M317_Sk1). Carrier of the genetic relations."@en .
-# OFFEN: Platzhalter Sk##/Sk### bekommen IRIs mit Zähler je Quelle (z. B. awg:M78_SkX_1); nicht stabil.
+# Platzhalter Sk##/Sk### bekommen IRIs mit einem Zähler je M-Nummer über den
+#   Komplex (z. B. awg:M78_SkX_1); nicht stabil.
 
 awg:SketchSegment
     a owl:Class ;
@@ -222,6 +223,7 @@ awg:RowTable
     rdfs:label "Reihentabelle"@de, "row table"@en ;
     rdfs:comment "Skizze mit den Formen einer Zwölftonreihe (z. B. awg:Op25_SkRT); gehört meist zum Opus, nicht zu einer M-Nummer."@de,
         "Sketch listing the forms of a twelve-tone row (e.g. awg:Op25_SkRT); usually belongs to the opus, not to an M number."@en .
+# IRI awg:<Komplex>_SkRT; Partials des Sheets als Segmente (z. B. awg:Op24_SkRTa).
 
 awg:ContinuityDraft
     a owl:Class ;
@@ -234,11 +236,18 @@ awg:Paratext
     a owl:Class ;
     rdfs:subClassOf awg:Inscription ;
     rdfs:label "Paratext"@de, "paratext"@en ;
-    rdfs:comment "Niederschrift auf einem Dokument, die zu einem Komplex oder einer Skizze gehört, sie aber nur begleitet (Titel, Datierung, Paginierung, Instrumentenvorsatz …); Zugehörigkeit zum Komplex per awg:belongsToComplex, Art über awg:paratextType."@de,
-        "Inscription on a document belonging to a complex or a sketch that it merely accompanies (title, dating, pagination, instrument indication …); membership of the complex via awg:belongsToComplex, kind via awg:paratextType."@en .
-# OFFEN: Bezug eines Paratexts zur Skizze (physDesc „zu …“, „nach …“) noch ohne
-#   eigene Property; heute nur über die genetischen Kanten.
-# OFFEN: Generierte Paratexte aus physDesc vs. kuratierte Nummerierung (_PT<n>).
+    rdfs:comment "Niederschrift auf einem Dokument, die zu einem Komplex oder einer Skizze gehört, sie aber nur begleitet (Titel, Datierung, Paginierung, Instrumentenvorsatz …); Zugehörigkeit zum Komplex per awg:belongsToComplex, zur Skizze per awg:accompanies, Art über awg:paratextType. IRI aus Folio, Art und Zähler je Folio und Art (z. B. awg:awg_doc_0050_7v_dating_1)."@de,
+        "Inscription on a document belonging to a complex or a sketch that it merely accompanies (title, dating, pagination, instrument indication …); membership of the complex via awg:belongsToComplex, of the sketch via awg:accompanies, kind via awg:paratextType. IRI from folio, kind and a counter per folio and kind (e.g. awg:awg_doc_0050_7v_dating_1)."@en .
+# Taktzahlen innerhalb einer Skizze („in M 317 Sk4“) sind keine Paratexte, nur
+#   solche mit eigener Position auf dem Blatt.
+
+awg:accompanies
+    a owl:ObjectProperty ;
+    rdfs:label "begleitet"@de, "accompanies"@en ;
+    rdfs:comment "Skizze, zu der ein Paratext gehört (physDesc „zu …“ oder „nach …“, z. B. eine Schlussdatierung nach der letzten Stelle einer Skizze); nicht genetisch. Eine Entstehungsfolge zwischen Paratext und Skizze steht nur explizit per awg:precedes oder awg:concomitates."@de,
+        "Sketch a paratext belongs to (physDesc „zu …“ or „nach …“, e.g. a final dating after the last passage of a sketch); not genetic. An order of genesis between paratext and sketch is only stated explicitly via awg:precedes or awg:concomitates."@en ;
+    schema:domainIncludes awg:Paratext ;
+    schema:rangeIncludes awg:Sketch .
 
 awg:paratextType
     a owl:ObjectProperty ;
@@ -255,8 +264,10 @@ awg:statedDate
         "Date stated by a dating (e.g. „16. VII. 34“ → 1934-07-16); not the date of origin of a sketch. The wording stays in the label."@en ;
     schema:domainIncludes awg:Paratext ;
     schema:rangeIncludes xsd:date .
-# OFFEN: Ortsangaben („Maria Enzersdorf“), Ereignisse und unvollständige Daten
-#   (ohne Jahr, z. B. „M. am 30. IX. nach Zürich abgereist.“).
+# Der Generator setzt awg:statedDate nur bei vollständigem Datum; ohne Jahr oder
+#   Tag bleibt nur das Label. Kuratiert kann ein Datum editorisch erschlossen
+#   werden (z. B. „M. am 30. IX. nach Zürich abgereist.“ → 1934-09-30).
+# OFFEN: Ortsangaben („Maria Enzersdorf“) und Ereignisse.
 
 awg:ParatextTypeScheme
     a skos:ConceptScheme ;
