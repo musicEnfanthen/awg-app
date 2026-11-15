@@ -35,8 +35,8 @@ export const FORCE_GRAPH_SIMULATION_CONFIG = Object.freeze<ForceGraphSimulationC
     ALPHA_REHEAT: 0.1,
     ALPHA_TARGET_DRAG: 0.1,
     SMALL_GRAPH: Object.freeze<ForceGraphSimulationForces>({
-        LINK_DISTANCE: 30,
-        CHARGE_STRENGTH: -20,
+        LINK_DISTANCE: 60,
+        CHARGE_STRENGTH: -40,
         CHARGE_THETA: 0.9,
         COLLISION_PADDING: 50,
         COLLISION_ITERATIONS: 2,
