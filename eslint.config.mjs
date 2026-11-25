@@ -345,6 +345,19 @@ export default defineConfig(
         },
     },
 
+    // RDF generator: pure functions without DOM, so that a Node script can run them as well
+    {
+        files: ['**/edition-graph/rdf-generator/**/*.ts'],
+        ignores: ['**/*.spec.ts'],
+        rules: {
+            'no-restricted-globals': [
+                'error',
+                { name: 'document', message: 'The RDF generator must stay DOM-free.' },
+                { name: 'window', message: 'The RDF generator must stay DOM-free.' },
+            ],
+        },
+    },
+
     // Specs and test helpers: test doubles are loosely typed, mock data is copied by spread,
     // and methods are referenced unbound in expectations
     {
